@@ -1,0 +1,19 @@
+name: SeriaCollection
+version: ${project.version}
+main: id.seria.collection.SeriaCollectionPlugin
+api-version: '1.21'
+author: Seria
+description: Hypixel-style Collection system
+depend: [SeriaCore]
+commands:
+  collect:
+    description: Open the collection menu
+    aliases: [collection]
+  seriacollection:
+    description: Admin commands for SeriaCollection
+    aliases: [scollect]
+    permission: seriacollection.admin
+permissions:
+  seriacollection.admin:
+    description: Allows use of admin commands
+    default: op

@@ -1,0 +1,15 @@
+# SeriaCollection Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# General Settings
+database:
+  filename: "data.db"
+
+# Visual Settings
+prefix: "<gray>[<yellow>SeriaCollection<gray>] "
+
+# Progress Notification Settings
+notifications:
+  chat: true
+  actionbar: true
+  title_on_tier_up: true

@@ -1,0 +1,8 @@
+prefix: "<dark_gray>[<yellow>Collection<dark_gray>] "
+no-permission: "<red>You do not have permission to use this command!"
+reload-success: "<prefix><green>Configuration reloaded successfully!"
+progress: "<prefix><gray>You collected <yellow>%amount% %item%<gray>! (<white>%current%/%next%<gray>)"
+tier-up: "Handled by multi-line code"
+invalid-collection: "<prefix><red>Invalid collection ID!"
+player-not-found: "<prefix><red>Player not found!"
+set-success: "<prefix><green>Successfully set <yellow>%player%'s <white>%item% collection to <yellow>%amount%<white>."

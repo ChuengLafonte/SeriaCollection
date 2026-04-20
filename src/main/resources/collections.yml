@@ -1,0 +1,507 @@
+categories:
+  farming:
+    name: "<yellow>Farming Collection"
+    icon: WHEAT
+    lore:
+      - "<gray>Collections related to farming crops."
+    collections:
+      wheat:
+        name: "Wheat"
+        material: WHEAT
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Packed Wheat <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Harvesting Exp Discount <green>(-25%)", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Shinning Wheat <gray>Recipe", "Farm Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Farming Talisman <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Enchanted Wheat <gray>Recipe", "Enchanted Bread <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: wheat 5"]
+            display-rewards: ["Farming Island <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Wheat Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: wheat 5"]
+            display-rewards: ["Small Agronomy Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Wheat Fortune"]
+          8:
+            requirement: 15000
+            rewards: ["fortune: wheat 10"]
+            display-rewards: ["Medium Agronomy Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Wheat Fortune"]
+          9:
+            requirement: 25000
+            rewards: ["fortune: wheat 10"]
+            display-rewards: ["Farm Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Wheat Fortune"]
+          10:
+            requirement: 50000
+            rewards: ["fortune: wheat 20"]
+            display-rewards: ["Large Agronomy Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Wheat Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: wheat 20"]
+            display-rewards: ["Enchanted Hay Bale <gray>Recipe", "Large Enchanted Agronomy Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Wheat Fortune"]
+      potato:
+        name: "Potato"
+        material: POTATO
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Mashed Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Potato Minion <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: potato 5"]
+            display-rewards: ["Cleansing Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Potato Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: potato 5"]
+            display-rewards: ["Vaccine Talisman <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Potato Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: potato 10"]
+            display-rewards: ["Crystalize Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Potato Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: potato 10"]
+            display-rewards: ["Enchanted Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Potato Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: potato 20"]
+            display-rewards: ["Hot Potato Book <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Potato Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: potato 20"]
+            display-rewards: ["Fuming Potato Book <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Potato Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: potato 50"]
+            display-rewards: ["Enchanted Baked Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Potato Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: potato 50"]
+            display-rewards: ["Potato Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Potato Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: potato 100"]
+            display-rewards: ["Special Potato <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+100 Potato Fortune"]
+      carrot:
+        name: "Carrot"
+        material: CARROT
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Carrot Jam <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Carrot Minion <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: carrot 5"]
+            display-rewards: ["Jello Carrot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Carrot Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: carrot 5"]
+            display-rewards: ["Carrot Candy <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Carrot Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: carrot 10"]
+            display-rewards: ["Shining Golden Carrot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Carrot Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: carrot 20"]
+            display-rewards: ["Enchanted Carrot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Carrot Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: carrot 20"]
+            display-rewards: ["Pet Luck Potion <gray>Recipe", "Creator Hoe <gray>Requirement", "<aqua>+4 SkyBlock XP", "<gold>+20 Carrot Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: carrot 50"]
+            display-rewards: ["Enchanted Golden Carrot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Carrot Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: carrot 50"]
+            display-rewards: ["Carrot Sack <gray>Recipe", "Constellation Hoe <gray>Requirement", "<aqua>+4 SkyBlock XP", "<gold>+50 Carrot Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: carrot 50"]
+            display-rewards: ["Golden Carrot Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Carrot Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: carrot 100"]
+            display-rewards: ["Blessed Carrot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+100 Carrot Fortune"]
+      beetroot:
+        name: "Beetroot"
+        material: BEETROOT
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Fermented Beetroot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: farming 2"]
+            display-rewards: ["Beetroot Minion <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Farming Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: beetroot 5"]
+            display-rewards: ["Beetroot Powder <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Beetroot Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: beetroot 10"]
+            display-rewards: ["Magical Soup <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Beetroot Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: beetroot 20"]
+            display-rewards: ["Enchanted Beetroot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Beetroot Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: beetroot 20"]
+            display-rewards: ["Beetroot Minion II <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Beetroot Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: beetroot 50"]
+            display-rewards: ["Enchanted Beetroot Soup <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Beetroot Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: beetroot 50"]
+            display-rewards: ["Beetroot Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+50 Beetroot Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: beetroot 100"]
+            display-rewards: ["Glimmering Beetroot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+100 Beetroot Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: beetroot 100"]
+            display-rewards: ["Royal Beetroot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+100 Beetroot Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: beetroot 200"]
+            display-rewards: ["Claustrophobic Hoe <gray>Requirement", "<aqua>+4 SkyBlock XP", "<gold>+200 Beetroot Fortune"]
+  foraging:
+    name: "<green>Foraging Collection"
+    icon: OAK_LOG
+    lore:
+      - "<gray>Collections related to wood cutting."
+    collections:
+      oak_log:
+        name: "Oak Wood"
+        material: OAK_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Woodcutter Axe <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Oak Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Apprentice Hatchet <gray>Recipe", "Oak Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Oak Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Wood Talisman <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: oak 5"]
+            display-rewards: ["Foraging Island <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Oak Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: oak 5"]
+            display-rewards: ["Small Foraging Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Oak Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: oak 10"]
+            display-rewards: ["Medium Foraging Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Oak Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: oak 10"]
+            display-rewards: ["Oak Guardian Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Oak Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: oak 20"]
+            display-rewards: ["Large Foraging Sack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Oak Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: oak 20"]
+            display-rewards: ["Ancient Oak Heart <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Oak Fortune"]
+      birch_log:
+        name: "Birch Wood"
+        material: BIRCH_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Birch Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Birch Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Birch Bark Cleaver <gray>Recipe", "Birch Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["White Wood Finish <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Condensed Birch Pulp <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: birch 5"]
+            display-rewards: ["Silver Log Slicer <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Birch Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: birch 5"]
+            display-rewards: ["Birch Minion XI <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Birch Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: birch 10"]
+            display-rewards: ["Lumberjack's Charm <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Birch Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: birch 10"]
+            display-rewards: ["Birch Guardian Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Birch Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: birch 20"]
+            display-rewards: ["Pristine Birch Essence <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Birch Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: birch 20"]
+            display-rewards: ["Forest spirit <gray>Summon", "<aqua>+4 SkyBlock XP", "<gold>+20 Birch Fortune"]
+      spruce_log:
+        name: "Spruce Wood"
+        material: SPRUCE_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Spruce Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Spruce Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Taiga Frost Blade <gray>Recipe", "Spruce Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Frost-bite Charm <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Frosted Wood Heart <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: spruce 5"]
+            display-rewards: ["Spruce Annihilator <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Spruce Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: spruce 5"]
+            display-rewards: ["Icy Wood Scraps <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Spruce Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: spruce 10"]
+            display-rewards: ["Wolf Paw <gray>Talisman", "<aqua>+4 SkyBlock XP", "<gold>+10 Spruce Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: spruce 10"]
+            display-rewards: ["Spruce Sentinel Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Spruce Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: spruce 20"]
+            display-rewards: ["Sub-Zero Fluid <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Spruce Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: spruce 20"]
+            display-rewards: ["Eternal Frost Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Spruce Fortune"]
+      dark_oak_log:
+        name: "Dark Oak Wood"
+        material: DARK_OAK_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Dark Oak Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Dark Oak Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Shadow Forest Scythe <gray>Recipe", "Dark Oak Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Growth Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Shadow Resin <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: dark_oak 5"]
+            display-rewards: ["Dark Wood Polish <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Dark Oak Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: dark_oak 5"]
+            display-rewards: ["Night-vision Charm <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Dark Oak Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: dark_oak 10"]
+            display-rewards: ["Vampire Mask <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Dark Oak Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: dark_oak 10"]
+            display-rewards: ["Shadow Stalker Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Dark Oak Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: dark_oak 20"]
+            display-rewards: ["Feeding Backpack <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Dark Oak Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: dark_oak 20"]
+            display-rewards: ["Cursed Forest Portal <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Dark Oak Fortune"]
+      acacia_log:
+        name: "Acacia Wood"
+        material: ACACIA_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Acacia Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Acacia Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Savannah Macket <gray>Recipe", "Acacia Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Sandy Wood Polish <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Savannah Essence <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: acacia 5"]
+            display-rewards: ["Desert Acacia Axe <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Acacia Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: acacia 5"]
+            display-rewards: ["Repelling Candle <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Acacia Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: acacia 10"]
+            display-rewards: ["Heat-resistant Charm <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Acacia Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: acacia 10"]
+            display-rewards: ["Savannah Scout Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Acacia Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: acacia 20"]
+            display-rewards: ["Drought-proof Potion <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Acacia Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: acacia 20"]
+            display-rewards: ["Sun-blessed Timber <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Acacia Fortune"]
+      jungle_log:
+        name: "Jungle Wood"
+        material: JUNGLE_LOG
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Jungle Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          2:
+            requirement: 100
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Enchanted Jungle Log <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          3:
+            requirement: 250
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Treecapitator Replica <gray>Recipe", "Jungle Suit <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          4:
+            requirement: 500
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Jungle Axe <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          5:
+            requirement: 1000
+            rewards: ["fortune: foraging 2"]
+            display-rewards: ["Vivid Jungle Essence <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+2 Foraging Fortune"]
+          6:
+            requirement: 2500
+            rewards: ["fortune: jungle 5"]
+            display-rewards: ["Slingshot <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+5 Jungle Fortune"]
+          7:
+            requirement: 10000
+            rewards: ["fortune: jungle 5"]
+            display-rewards: ["Monkey Paw <gray>Talisman", "<aqua>+4 SkyBlock XP", "<gold>+5 Jungle Fortune"]
+          8:
+            requirement: 25000
+            rewards: ["fortune: jungle 10"]
+            display-rewards: ["Haste Potion <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+10 Jungle Fortune"]
+          9:
+            requirement: 50000
+            rewards: ["fortune: jungle 10"]
+            display-rewards: ["Jungle Predator Armor <gray>Recipes", "<aqua>+4 SkyBlock XP", "<gold>+10 Jungle Fortune"]
+          10:
+            requirement: 75000
+            rewards: ["fortune: jungle 20"]
+            display-rewards: ["Rainforest Catalyst <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Jungle Fortune"]
+          11:
+            requirement: 100000
+            rewards: ["fortune: jungle 20"]
+            display-rewards: ["Ancient Overgrowth <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+20 Jungle Fortune"]
+  mining:
+    name: "<white>Mining Collection"
+    icon: COBBLESTONE
+    lore:
+      - "<gray>Collections related to mining ores."
+    collections:
+      cobblestone:
+        name: "Cobblestone"
+        material: COBBLESTONE
+        tiers:
+          1:
+            requirement: 50
+            rewards: ["fortune: farming 1"]
+            display-rewards: ["Cobblestone Minion I <gray>Recipe", "<aqua>+4 SkyBlock XP", "<gold>+1 Farming Fortune"]
