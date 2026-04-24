@@ -3,10 +3,15 @@ package id.seria.collection;
 import id.seria.collection.commands.CollectCommand;
 import id.seria.collection.commands.AdminCommand;
 import id.seria.collection.listeners.CollectionListener;
+import id.seria.collection.listeners.MMOItemsCraftListener;
+import id.seria.collection.listeners.MenuListener;
+import id.seria.collection.integration.mmoitems.SCollectRequirementStat;
 import id.seria.collection.managers.*;
 import id.seria.collection.placeholders.CollectionPlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.Indyuce.mmoitems.MMOItems;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -15,9 +20,9 @@ public class SeriaCollectionPlugin extends JavaPlugin {
 
     private static SeriaCollectionPlugin instance;
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    public static NamespacedKey DROPPED_ITEM_KEY;
     
     private ConfigManager configManager;
-    private DatabaseManager databaseManager;
     private CollectionManager collectionManager;
     private PlayerDataManager playerDataManager;
     private GuiManager guiManager;
@@ -25,6 +30,8 @@ public class SeriaCollectionPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        
+        DROPPED_ITEM_KEY = new NamespacedKey(this, "dropped_item");
         
         // Ensure folder exists
         if (!getDataFolder().exists()) {
@@ -41,9 +48,7 @@ public class SeriaCollectionPlugin extends JavaPlugin {
             this.configManager = new ConfigManager(this);
             this.configManager.loadConfigs();
 
-            logger.info("Initializing DatabaseManager...");
-            this.databaseManager = new DatabaseManager(this);
-            this.databaseManager.initialize();
+            // Removed local DatabaseManager init
 
             logger.info("Initializing PlayerDataManager, CollectionManager, and GuiManager...");
             this.playerDataManager = new PlayerDataManager(this);
@@ -53,7 +58,13 @@ public class SeriaCollectionPlugin extends JavaPlugin {
             // Register Listeners
             logger.info("Registering Listeners...");
             getServer().getPluginManager().registerEvents(new CollectionListener(this), this);
-            getServer().getPluginManager().registerEvents(new id.seria.collection.listeners.MenuListener(), this);
+            getServer().getPluginManager().registerEvents(new MenuListener(), this);
+            
+            // Register MMOItems Integration Listener
+            if (Bukkit.getPluginManager().isPluginEnabled("MMOItems")) {
+                getServer().getPluginManager().registerEvents(new MMOItemsCraftListener(this), this);
+                logger.info("MMOItems integration listener registered!");
+            }
 
             // Register Commands
             logger.info("Registering Commands...");
@@ -87,9 +98,7 @@ public class SeriaCollectionPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (databaseManager != null) {
-            databaseManager.close();
-        }
+        // Database cleanup handled by SeriaCore
     }
 
     public static SeriaCollectionPlugin getInstance() {
@@ -104,9 +113,7 @@ public class SeriaCollectionPlugin extends JavaPlugin {
         return configManager;
     }
 
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
+    // Removed getDatabaseManager as it's now centralized in SeriaCore
 
     public CollectionManager getCollectionManager() {
         return collectionManager;

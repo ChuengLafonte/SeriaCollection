@@ -1,0 +1,115 @@
+main-menu:
+  title: "Koleksi"
+  size: 54
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+  items:
+    info:
+      slot: 4
+      material: PAINTING
+      name: "<green>Koleksi"
+      lore:
+        - "<gray>Lihat semua item yang tersedia"
+        - "<gray>di SkyBlock. Kumpulkan item lebih"
+        - "<gray>banyak untuk membuka hadiah dalam"
+        - "<gray>perjalananmu menjadi master"
+        - "<gray>SkyBlock!"
+        - ""
+        - "<gray>Koleksi Terbuka: <yellow>%percentage%%"
+        - "<dark_gray>---------------------------- <yellow>%unlocked%/%total%"
+        - ""
+        - "<yellow>Klik untuk melihat peringkat!"
+    close:
+      slot: 49
+      material: BARRIER
+      name: "<red>Tutup"
+    categories:
+      slots: [19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+      # Lore di bawah ditambahkan ke lore dasar kategori
+      footer:
+        - ""
+        - "<gray>Koleksi Terbuka: <yellow>%percentage%%"
+        - "<dark_gray>---------------------------- <yellow>%unlocked%/%total%"
+        - ""
+        - "<yellow>Klik untuk melihat detail!"
+
+category-menu:
+  title: "Koleksi %category%"
+  size: 54
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+  items:
+    info:
+      slot: 4
+      # Material diwarisi dari ikon kategori
+      name: "<green>Koleksi %category%"
+      lore:
+        - "<gray>Lihat Koleksi %category% milikmu!"
+        - ""
+        - "<gray>Koleksi Terbuka: <gold>%percentage%%"
+        - "<dark_gray>---------------------------- <yellow>%unlocked%/%total%"
+    back:
+      slot: 48
+      material: ARROW
+      name: "<red>Kembali"
+    close:
+      slot: 49
+      material: BARRIER
+      name: "<red>Tutup"
+    collections:
+      slots: [19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+      # Lore untuk setiap item koleksi
+      lore:
+        - ""
+        - "<gray>Progres: <yellow>%amount%"
+        - "<gray>Tingkat Berikutnya: <white>%next_tier%"
+        - "<gray>Syarat: <yellow>%amount_formatted% <gray>/ <white>%requirement_formatted%"
+        - ""
+        - "<green>Klik untuk melihat detail!"
+      maxed-lore:
+        - ""
+        - "<gray>Progres: <yellow>%amount%"
+        - "<green>SUDAH MAKSIMAL!"
+
+collection-detail:
+  title: "<dark_gray>Koleksi: %collection%"
+  size: 54
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+  items:
+    info:
+      slot: 4
+      # Material diwarisi dari material koleksi
+      name: "<yellow>Koleksi %collection%"
+      lore:
+        - "<gray>Lihat semua progres dan hadiah"
+        - "<gray>Koleksi %collection% milikmu!"
+        - ""
+        - "<gray>Total Terkumpul: <yellow>%amount_formatted%"
+    back:
+      slot: 48
+      material: ARROW
+      name: "<red>Kembali"
+    close:
+      slot: 49
+      material: BARRIER
+      name: "<red>Tutup"
+    tiers:
+      slots: [19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+      unlocked-material: LIME_STAINED_GLASS_PANE
+      locked-material: RED_STAINED_GLASS_PANE
+      name: "%status_color%%collection% %tier%"
+      lore:
+        - "<gray>Progres: <green>%percentage%%"
+        - "%progress_bar% <yellow>%amount_formatted%/%requirement_formatted%"
+        - ""
+        - "<white>Hadiah:"
+        - "%rewards_list%"
+        # Daftar hadiah ditangani secara dinamis dalam kode
+        - ""
+        - "%status_text%"
+      unlocked-status: "<green>TERBUKA"
+      locked-status: "<red>TERKUNCI"

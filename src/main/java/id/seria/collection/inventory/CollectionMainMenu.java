@@ -2,9 +2,11 @@ package id.seria.collection.inventory;
 
 import id.seria.collection.SeriaCollectionPlugin;
 import id.seria.collection.models.Category;
+import id.seria.collection.utils.GuiUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,51 +24,118 @@ public class CollectionMainMenu implements InventoryHolder, Listener {
 
     private final SeriaCollectionPlugin plugin;
     private final Inventory inventory;
+    private final ConfigurationSection config;
 
     public CollectionMainMenu(SeriaCollectionPlugin plugin) {
         this.plugin = plugin;
-        this.inventory = Bukkit.createInventory(this, 54, SeriaCollectionPlugin.getMiniMessage().deserialize("<dark_gray>Collection Menu"));
-        
-        // Register this instance as a listener temporarily or use a global manager
-        // In SeriaFarm style, they often register GUI classes in onEnable. 
-        // I will follow the pattern of creating a base menu if possible, but for now 
-        // let's just make it work using local registration or a static check in a global listener.
+        this.config = plugin.getConfigManager().getGuisConfig().getConfigurationSection("main-menu");
+        int size = config.getInt("size", 54);
+        String title = config.getString("title", "Collections");
+        this.inventory = Bukkit.createInventory(this, size, GuiUtils.format(title));
     }
 
     public void open(Player player) {
-        setupItems();
+        setupItems(player);
         player.openInventory(inventory);
     }
 
-    private void setupItems() {
+    private void setupItems(Player player) {
         inventory.clear();
         
-        // Fill glass
-        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta glassMeta = glass.getItemMeta();
-        glassMeta.displayName(Component.empty());
-        glass.setItemMeta(glassMeta);
-        for (int i = 0; i < 54; i++) inventory.setItem(i, glass);
+        // Fill glass (Filler)
+        ConfigurationSection fillerCfg = config.getConfigurationSection("filler");
+        if (fillerCfg != null) {
+            Material fillerMat = Material.valueOf(fillerCfg.getString("material", "GRAY_STAINED_GLASS_PANE"));
+            String fillerName = fillerCfg.getString("name", " ");
+            ItemStack filler = new ItemStack(fillerMat);
+            ItemMeta fillerMeta = filler.getItemMeta();
+            fillerMeta.displayName(GuiUtils.format(fillerName));
+            filler.setItemMeta(fillerMeta);
+            for (int i = 0; i < inventory.getSize(); i++) inventory.setItem(i, filler);
+        }
 
         Map<String, Category> categories = plugin.getCollectionManager().getCategories();
-        int[] slots = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25};
+        
+        // Calculate total stats
+        int totalCollections = 0;
+        int unlockedCollections = 0;
+        for (Category cat : categories.values()) {
+            for (id.seria.collection.models.Collection coll : cat.getCollections().values()) {
+                totalCollections++;
+                if (plugin.getPlayerDataManager().getAmount(player.getUniqueId(), coll.getId()) > 0) {
+                    unlockedCollections++;
+                }
+            }
+        }
+        int totalPercent = (totalCollections == 0) ? 0 : (unlockedCollections * 100 / totalCollections);
+
+        // Info Icon
+        ConfigurationSection infoCfg = config.getConfigurationSection("items.info");
+        if (infoCfg != null) {
+            ItemStack infoItem = new ItemStack(Material.valueOf(infoCfg.getString("material", "PAINTING")));
+            ItemMeta infoMeta = infoItem.getItemMeta();
+            infoMeta.displayName(GuiUtils.format(infoCfg.getString("name", "")));
+            
+            List<Component> infoLore = new ArrayList<>();
+            for (String line : infoCfg.getStringList("lore")) {
+                infoLore.add(GuiUtils.format(line
+                    .replace("%percentage%", String.valueOf(totalPercent))
+                    .replace("%unlocked%", String.valueOf(unlockedCollections))
+                    .replace("%total%", String.valueOf(totalCollections))));
+            }
+            infoMeta.lore(infoLore);
+            infoItem.setItemMeta(infoMeta);
+            inventory.setItem(infoCfg.getInt("slot", 4), infoItem);
+        }
+
+        // Close button
+        ConfigurationSection closeCfg = config.getConfigurationSection("items.close");
+        if (closeCfg != null) {
+            ItemStack closeItem = new ItemStack(Material.valueOf(closeCfg.getString("material", "BARRIER")));
+            ItemMeta closeMeta = closeItem.getItemMeta();
+            closeMeta.displayName(GuiUtils.format(closeCfg.getString("name", "<red>Close")));
+            closeItem.setItemMeta(closeMeta);
+            inventory.setItem(closeCfg.getInt("slot", 49), closeItem);
+        }
+
+        // Categories
+        List<Integer> slots = config.getIntegerList("items.categories.slots");
+        List<String> footerLines = config.getStringList("items.categories.footer");
         
         int i = 0;
         for (Category category : categories.values()) {
-            if (i >= slots.length) break;
+            if (i >= slots.size()) break;
             
             ItemStack item = new ItemStack(category.getIcon());
             ItemMeta meta = item.getItemMeta();
-            meta.displayName(SeriaCollectionPlugin.getMiniMessage().deserialize(category.getName()));
+            meta.displayName(GuiUtils.format("<green>" + category.getName().replace("<white>", "").replace("<green>", "")));
             
             List<Component> lore = new ArrayList<>();
             for (String line : category.getLore()) {
-                lore.add(SeriaCollectionPlugin.getMiniMessage().deserialize(line));
+                lore.add(GuiUtils.format(line));
             }
+            
+            // Category Progress
+            int catTotal = category.getCollections().size();
+            int catUnlocked = 0;
+            for (id.seria.collection.models.Collection coll : category.getCollections().values()) {
+                if (plugin.getPlayerDataManager().getAmount(player.getUniqueId(), coll.getId()) > 0) {
+                    catUnlocked++;
+                }
+            }
+            int catPercent = (catTotal == 0) ? 0 : (catUnlocked * 100 / catTotal);
+            
+            for (String line : footerLines) {
+                lore.add(GuiUtils.format(line
+                    .replace("%percentage%", String.valueOf(catPercent))
+                    .replace("%unlocked%", String.valueOf(catUnlocked))
+                    .replace("%total%", String.valueOf(catTotal))));
+            }
+            
             meta.lore(lore);
             item.setItemMeta(meta);
             
-            inventory.setItem(slots[i], item);
+            inventory.setItem(slots.get(i), item);
             i++;
         }
     }
@@ -80,12 +149,17 @@ public class CollectionMainMenu implements InventoryHolder, Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() instanceof CollectionMainMenu) {
             event.setCancelled(true);
-            
             if (event.getCurrentItem() == null) return;
+            
             Player player = (Player) event.getWhoClicked();
             ItemStack clicked = event.getCurrentItem();
             
-            // Find category by item name (simple approach) or slot mapping
+            int closeSlot = config.getInt("items.close.slot", 49);
+            if (event.getSlot() == closeSlot) {
+                player.closeInventory();
+                return;
+            }
+
             Map<String, Category> categories = plugin.getCollectionManager().getCategories();
             for (Category category : categories.values()) {
                 if (clicked.getType() == category.getIcon()) {

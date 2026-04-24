@@ -34,6 +34,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<yellow>SeriaCollection Admin Commands:"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect reload"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect set <player> <collection_id> <amount>"));
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect reset <player> <collection_id|all>"));
             return true;
         }
 
@@ -59,7 +60,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
 
             try {
                 int amount = Integer.parseInt(args[3]);
-                plugin.getPlayerDataManager().addAmount(target, collId, amount - plugin.getPlayerDataManager().getAmount(target.getUniqueId(), collId));
+                plugin.getPlayerDataManager().forceSetAmount(target, collId, amount);
                 
                 String msg = plugin.getConfigManager().getMessage("set-success")
                         .replace("%player%", target.getName())
@@ -72,26 +73,111 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("forcetier") && args.length >= 4) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("player-not-found")));
+                return true;
+            }
+
+            String collId = args[2];
+            Collection collection = plugin.getCollectionManager().getCollection(collId);
+            if (collection == null) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("invalid-collection")));
+                return true;
+            }
+
+            try {
+                int tierLevel = Integer.parseInt(args[3]);
+                id.seria.collection.models.Tier tier = collection.getTier(tierLevel);
+                if (tier == null) {
+                    sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<red>Tier " + tierLevel + " tidak tersedia untuk koleksi ini!"));
+                    return true;
+                }
+
+                plugin.getPlayerDataManager().forceSetAmount(target, collId, tier.getRequirement());
+                
+                String msg = plugin.getConfigManager().getMessage("forcetier-success");
+                if (msg.equals("forcetier-success")) {
+                    msg = "<prefix><red>Missing message: forcetier-success";
+                }
+                msg = msg.replace("%player%", target.getName())
+                        .replace("%item%", collection.getName())
+                        .replace("%tier%", String.valueOf(tierLevel));
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(msg));
+            } catch (NumberFormatException e) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<red>Tier level must be a number!"));
+            }
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("reset") && args.length >= 3) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("player-not-found")));
+                return true;
+            }
+
+            String collId = args[2];
+            if (collId.equalsIgnoreCase("all")) {
+                plugin.getPlayerDataManager().resetAllCollections(target);
+                String msg = plugin.getConfigManager().getMessage("reset-all-success")
+                        .replace("%player%", target.getName());
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(msg));
+                return true;
+            }
+
+            Collection collection = plugin.getCollectionManager().getCollection(collId);
+            if (collection == null) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("invalid-collection")));
+                return true;
+            }
+
+            plugin.getPlayerDataManager().resetCollection(target, collId);
+            String msg = plugin.getConfigManager().getMessage("reset-success")
+                    .replace("%player%", target.getName())
+                    .replace("%item%", collection.getName());
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(msg));
+            return true;
+        }
+
         return true;
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return List.of("reload", "set").stream()
+            return List.of("reload", "set", "forcetier", "reset").stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
-        if (args.length == 2 && args[0].equalsIgnoreCase("set")) {
+        if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset"))) {
             return null; // Return null for player list
         }
 
-        if (args.length == 3 && args[0].equalsIgnoreCase("set")) {
-            return new ArrayList<>(plugin.getCollectionManager().getCategories().values().stream()
+        if (args.length == 3 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset"))) {
+            List<String> suggestions = new ArrayList<>();
+            if (args[0].equalsIgnoreCase("reset")) {
+                suggestions.add("all");
+            }
+            suggestions.addAll(plugin.getCollectionManager().getCategories().values().stream()
                     .flatMap(c -> c.getCollections().keySet().stream())
-                    .filter(s -> s.startsWith(args[2].toLowerCase()))
                     .collect(Collectors.toList()));
+            
+            return suggestions.stream()
+                    .filter(s -> s.startsWith(args[2].toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (args.length == 4 && args[0].equalsIgnoreCase("forcetier")) {
+            Collection collection = plugin.getCollectionManager().getCollection(args[2]);
+            if (collection != null) {
+                return collection.getTiers().keySet().stream()
+                        .map(String::valueOf)
+                        .filter(s -> s.startsWith(args[3]))
+                        .collect(Collectors.toList());
+            }
         }
 
         return new ArrayList<>();

@@ -11,8 +11,10 @@ public class ConfigManager {
     private final SeriaCollectionPlugin plugin;
     private FileConfiguration collectionsConfig;
     private FileConfiguration messagesConfig;
+    private FileConfiguration guisConfig;
     private File collectionsFile;
     private File messagesFile;
+    private File guisFile;
 
     public ConfigManager(SeriaCollectionPlugin plugin) {
         this.plugin = plugin;
@@ -32,12 +34,19 @@ public class ConfigManager {
             plugin.saveResource("messages.yml", false);
         }
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+
+        guisFile = new File(plugin.getDataFolder(), "guis.yml");
+        if (!guisFile.exists()) {
+            plugin.saveResource("guis.yml", false);
+        }
+        guisConfig = YamlConfiguration.loadConfiguration(guisFile);
     }
 
     public void reloadConfigs() {
         plugin.reloadConfig();
         collectionsConfig = YamlConfiguration.loadConfiguration(collectionsFile);
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        guisConfig = YamlConfiguration.loadConfiguration(guisFile);
         plugin.getCollectionManager().loadCollections(); // Refresh collections in memory
     }
 
@@ -47,6 +56,10 @@ public class ConfigManager {
 
     public FileConfiguration getMessagesConfig() {
         return messagesConfig;
+    }
+
+    public FileConfiguration getGuisConfig() {
+        return guisConfig;
     }
 
     public String getMessage(String path) {

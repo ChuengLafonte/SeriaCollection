@@ -1,5 +1,7 @@
 package id.seria.collection.utils;
 
+import net.kyori.adventure.text.Component;
+import id.seria.collection.SeriaCollectionPlugin;
 import java.util.TreeMap;
 
 public class GuiUtils {
@@ -37,5 +39,10 @@ public class GuiUtils {
 
         return completedColor + String.valueOf(symbol).repeat(progressBars)
                 + notCompletedColor + String.valueOf(symbol).repeat(totalBars - progressBars);
+    }
+
+    public static Component format(String text) {
+        if (text == null || text.isEmpty()) return Component.empty();
+        return SeriaCollectionPlugin.getMiniMessage().deserialize("<!italic>" + text);
     }
 }

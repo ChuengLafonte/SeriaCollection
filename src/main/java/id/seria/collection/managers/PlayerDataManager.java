@@ -5,6 +5,7 @@ import id.seria.collection.models.Collection;
 import id.seria.collection.models.Tier;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +24,23 @@ public class PlayerDataManager {
 
     public PlayerDataManager(SeriaCollectionPlugin plugin) {
         this.plugin = plugin;
+        setupTables();
+    }
+
+    private void setupTables() {
+        id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().runAsync(conn -> {
+            try (java.sql.Statement smt = conn.createStatement()) {
+                smt.execute("CREATE TABLE IF NOT EXISTS player_collections (" +
+                        "uuid TEXT NOT NULL, " +
+                        "collection_id TEXT NOT NULL, " +
+                        "amount INTEGER DEFAULT 0, " +
+                        "PRIMARY KEY (uuid, collection_id)" +
+                        ");");
+            } catch (java.sql.SQLException e) {
+                plugin.getLogger().severe("Failed to setup player_collections table in centralized database!");
+                e.printStackTrace();
+            }
+        });
     }
 
     public void loadPlayerData(UUID uuid) {
@@ -30,7 +48,9 @@ public class PlayerDataManager {
         String sql = "SELECT collection_id, amount FROM player_collections WHERE uuid = ?";
         
         try {
-            Connection conn = plugin.getDatabaseManager().getConnection();
+            Connection conn = id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().getConnection();
+            if (conn == null) return;
+            
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
                 ResultSet rs = ps.executeQuery();
@@ -72,9 +92,54 @@ public class PlayerDataManager {
         checkTierUp(player, collectionId, current, next);
     }
 
+    public void forceSetAmount(Player player, String collectionId, int targetAmount) {
+        int current = getAmount(player.getUniqueId(), collectionId);
+        int diff = targetAmount - current;
+        if (diff != 0) {
+            addAmount(player, collectionId, diff);
+        }
+    }
+
+    public void resetCollection(Player player, String collectionId) {
+        UUID uuid = player.getUniqueId();
+        Map<String, Integer> data = cache.get(uuid);
+        if (data != null) {
+            data.remove(collectionId);
+        }
+        
+        id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().runAsync(conn -> {
+            String sql = "DELETE FROM player_collections WHERE uuid = ? AND collection_id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, collectionId);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void resetAllCollections(Player player) {
+        UUID uuid = player.getUniqueId();
+        cache.remove(uuid);
+        
+        id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().runAsync(conn -> {
+            String sql = "DELETE FROM player_collections WHERE uuid = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, uuid.toString());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     public void handleCollectionGain(Player player, org.bukkit.inventory.ItemStack item) {
         if (item == null || item.getType().isAir()) return;
         
+        // --- ANTI-EXPLOIT: Check Taint ---
+        if (isTainted(item)) return;
+
         id.seria.collection.models.Collection collection = null;
         
         // 1. Try MMOItem Tracking
@@ -88,7 +153,6 @@ public class PlayerDataManager {
                 }
             }
         } catch (NoClassDefFoundError ignored) {
-            // MythicLib not available or incorrect version
         }
         
         // 2. Fallback to Material Tracking
@@ -98,20 +162,33 @@ public class PlayerDataManager {
         
         if (collection != null) {
             addAmount(player, collection.getId(), item.getAmount());
+            // --- ANTI-EXPLOIT: Taint after gain ---
+            taintItem(item);
         }
     }
 
+    public void taintItem(org.bukkit.inventory.ItemStack item) {
+        if (item == null || item.getType().isAir()) return;
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+        
+        meta.getPersistentDataContainer().set(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+        item.setItemMeta(meta);
+    }
+
+    public boolean isTainted(org.bukkit.inventory.ItemStack item) {
+        if (item == null || item.getType().isAir() || !item.hasItemMeta()) return false;
+        return item.getItemMeta().getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE);
+    }
+
     private void savePlayerData(UUID uuid, String collectionId, int amount) {
-        CompletableFuture.runAsync(() -> {
+        id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().runAsync(conn -> {
             String sql = "INSERT OR REPLACE INTO player_collections (uuid, collection_id, amount) VALUES (?, ?, ?)";
-            try {
-                Connection conn = plugin.getDatabaseManager().getConnection();
-                try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    ps.setString(1, uuid.toString());
-                    ps.setString(2, collectionId);
-                    ps.setInt(3, amount);
-                    ps.executeUpdate();
-                }
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, collectionId);
+                ps.setInt(3, amount);
+                ps.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -124,64 +201,74 @@ public class PlayerDataManager {
 
         for (Tier tier : collection.getTiers().values()) {
             if (oldAmount < tier.getRequirement() && newAmount >= tier.getRequirement()) {
-                // Tier Up Logic
                 handleTierUp(player, collection, tier);
             }
         }
     }
 
     private void handleTierUp(Player player, Collection collection, Tier tier) {
-        // Run rewards on main thread
         Bukkit.getScheduler().runTask(plugin, () -> {
             String prefix = SeriaCollectionPlugin.getMiniMessage().serialize(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("prefix")));
             
-            // Notification Elements
+            ConfigurationSection msgConfig = plugin.getConfigManager().getMessagesConfig().getConfigurationSection("tier-up");
+            if (msgConfig == null) return;
+
             String oldRoman = id.seria.core.utils.NumberUtils.toRoman(tier.getLevel() - 1);
             String newRoman = id.seria.core.utils.NumberUtils.toRoman(tier.getLevel());
-            
-            StringBuilder sb = new StringBuilder();
-            sb.append("<strikethrough><yellow>                                                             </yellow></strikethrough>\n");
-            sb.append("<gold><b>COLLECTION LEVEL UP </b><white>").append(collection.getName()).append(" ");
-            if (tier.getLevel() > 1) {
-                sb.append("<gray>").append(oldRoman).append("➜<white>").append(newRoman);
-            } else {
-                sb.append("<white>").append(newRoman);
-            }
-            sb.append("\n\n");
-            sb.append("<green><b>REWARDS</b>\n");
-            
+            String tierChange = (tier.getLevel() > 1) ? "<gray>" + oldRoman + "➜<white>" + newRoman : "<white>" + newRoman;
+
+            StringBuilder rewardsSb = new StringBuilder();
             List<String> displayRewards = tier.getDisplayRewards();
+            String rewardFormat = msgConfig.getString("reward-format", "<green>  ✔ <gray>%reward%");
+            
             if (displayRewards != null && !displayRewards.isEmpty()) {
-                for (String dr : displayRewards) {
-                    sb.append("<green>  ✔ <gray>").append(dr).append("\n");
+                for (int i = 0; i < displayRewards.size(); i++) {
+                    rewardsSb.append(rewardFormat.replace("%reward%", displayRewards.get(i)));
+                    if (i < displayRewards.size() - 1) rewardsSb.append("\n");
                 }
             } else {
-                sb.append("<gray>  <i>None</i>\n");
+                rewardsSb.append(msgConfig.getString("no-rewards", "<gray>  <i>Tidak ada</i>"));
             }
-            sb.append("\n<strikethrough><yellow>                                                             </yellow></strikethrough>");
 
-            player.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(sb.toString()));
+            List<String> messageLines = msgConfig.getStringList("message");
+            for (String line : messageLines) {
+                String formatted = line
+                        .replace("%collection%", collection.getName())
+                        .replace("%tier_change%", tierChange)
+                        .replace("%old_tier_roman%", oldRoman)
+                        .replace("%new_tier_roman%", newRoman)
+                        .replace("%rewards%", rewardsSb.toString());
+                
+                player.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(formatted));
+            }
 
             // Execute Rewards
             for (String reward : tier.getRewards()) {
-                if (reward.startsWith("cmd: ")) {
-                    String cmd = reward.substring(5).replace("%player%", player.getName());
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-                } else if (reward.startsWith("msg: ")) {
+                if (reward.startsWith("msg: ")) {
                     String rmsg = reward.substring(5).replace("%player%", player.getName()).replace("%prefix%", prefix);
                     player.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(rmsg));
-                } else if (reward.startsWith("fortune: ")) {
-                    String[] parts = reward.substring(9).split(" ");
-                    if (parts.length >= 2) {
-                        String type = parts[0];
-                        String amount = parts[1];
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sfortune add " + player.getName() + " " + type + " " + amount);
-                    }
+                } else {
+                    id.seria.core.utils.RewardUtility.giveReward(player, reward);
                 }
             }
         });
     }
 
+    public int getTierLevel(UUID uuid, String collectionId) {
+        int amount = getAmount(uuid, collectionId);
+        Collection collection = plugin.getCollectionManager().getCollection(collectionId);
+        if (collection == null) return 0;
+
+        int currentTier = 0;
+        for (Tier tier : collection.getTiers().values()) {
+            if (amount >= tier.getRequirement()) {
+                currentTier = tier.getLevel();
+            } else {
+                break;
+            }
+        }
+        return currentTier;
+    }
 
     public void unloadPlayerData(UUID uuid) {
         cache.remove(uuid);

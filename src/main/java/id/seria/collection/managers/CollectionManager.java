@@ -56,30 +56,47 @@ public class CollectionManager {
 
                     String collName = collSection.getString("name", collKey);
                     String mmoId = collSection.getString("mmoitem-id");
-                    Material mat = Material.AIR;
-                    try {
-                        mat = Material.valueOf(collSection.getString("material", "AIR").toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Invalid material for collection " + collKey + ": " + collSection.getString("material"));
+                    
+                    List<Material> materialList = new ArrayList<>();
+                    if (collSection.contains("material")) {
+                        // Check if it's a list or a single string
+                        if (collSection.isList("material")) {
+                            for (String matStr : collSection.getStringList("material")) {
+                                try {
+                                    materialList.add(Material.valueOf(matStr.toUpperCase()));
+                                } catch (IllegalArgumentException ignored) {}
+                            }
+                        } else {
+                            try {
+                                materialList.add(Material.valueOf(collSection.getString("material", "AIR").toUpperCase()));
+                            } catch (IllegalArgumentException ignored) {}
+                        }
                     }
 
-                    Collection collection = new Collection(collKey, collName, mat, mmoId);
+                    Collection collection = new Collection(collKey, collName, materialList, mmoId);
 
                     ConfigurationSection tiersSection = collSection.getConfigurationSection("tiers");
                     if (tiersSection != null) {
                         for (String tierKey : tiersSection.getKeys(false)) {
-                            int level = Integer.parseInt(tierKey);
-                            int req = tiersSection.getInt(tierKey + ".requirement");
-                            List<String> rewards = tiersSection.getStringList(tierKey + ".rewards");
-                            List<String> displayRewards = tiersSection.getStringList(tierKey + ".display-rewards");
+                            try {
+                                int level = Integer.parseInt(tierKey);
+                                int req = tiersSection.getInt(tierKey + ".requirement");
+                                List<String> rewards = tiersSection.getStringList(tierKey + ".rewards");
+                                List<String> displayRewards = tiersSection.getStringList(tierKey + ".display-rewards");
 
-                            collection.addTier(new Tier(level, req, rewards, displayRewards));
+                                collection.addTier(new Tier(level, req, rewards, displayRewards));
+                            } catch (NumberFormatException ignored) {}
                         }
                     }
 
                     category.addCollection(collection);
                     collectionsById.put(collKey, collection);
-                    collectionsByMaterial.put(mat, collection);
+                    
+                    // Register all materials to this collection
+                    for (Material m : materialList) {
+                        collectionsByMaterial.put(m, collection);
+                    }
+                    
                     if (mmoId != null && !mmoId.isEmpty()) {
                         collectionsByMmoId.put(mmoId.toUpperCase(), collection);
                     }
