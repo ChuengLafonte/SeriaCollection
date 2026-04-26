@@ -60,8 +60,16 @@ public class SeriaCollectionPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new CollectionListener(this), this);
             getServer().getPluginManager().registerEvents(new MenuListener(), this);
             
-            // Register MMOItems Integration Listener
+            // Register MMOItems Integration
             if (Bukkit.getPluginManager().isPluginEnabled("MMOItems")) {
+                // Only register if it doesn't exist yet (prevents error on reload)
+                if (MMOItems.plugin.getStats().get("SCOLLECT_TIER") == null) {
+                    MMOItems.plugin.getStats().register(new SCollectRequirementStat());
+                    logger.info("Custom stat SCOLLECT_TIER registered!");
+                } else {
+                    logger.info("Custom stat SCOLLECT_TIER already exists, skipping registration.");
+                }
+                
                 getServer().getPluginManager().registerEvents(new MMOItemsCraftListener(this), this);
                 logger.info("MMOItems integration listener registered!");
             }

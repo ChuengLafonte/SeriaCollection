@@ -47,22 +47,19 @@ public class MMOItemsCraftListener implements Listener {
             id = MMOItems.getID(nbt);
         }
 
-        // Fallback: Check Recipe Key (Tembak API MMOItems via NamespacedKey)
+        // Fallback: Check Recipe Key
         if (type == null && e.getRecipe() instanceof org.bukkit.Keyed keyed) {
             org.bukkit.NamespacedKey key = keyed.getKey();
-            if (key.getNamespace().equalsIgnoreCase("mmoitems")) {
+            if (key.getNamespace().equalsIgnoreCase("mmoitems") || key.getNamespace().equalsIgnoreCase("seriacrafting")) {
                 String[] parts = key.getKey().split("_");
                 if (parts.length >= 3) {
-                    // Format: type_id_number (e.g. shaped_miscellaneous_enchanted_oak_log_1)
                     type = MMOItems.plugin.getTypes().get(parts[1].toUpperCase());
-                    // Reconstruct ID if it contains underscores
                     StringBuilder idBuilder = new StringBuilder();
                     for (int i = 2; i < parts.length - 1; i++) {
                         if (i > 2) idBuilder.append("_");
                         idBuilder.append(parts[i]);
                     }
                     id = idBuilder.toString().toUpperCase();
-                    // player.sendMessage("§7[Debug] Identified via Recipe Key: " + type.getId() + " - " + id);
                 }
             }
         }
@@ -72,23 +69,18 @@ public class MMOItemsCraftListener implements Listener {
         MMOItemTemplate template = MMOItems.plugin.getTemplates().getTemplate(type, id);
         if (template == null) return;
 
-        // Use the stat instance to get the data (Check for CUSTOM_SCOLLECT_TIER)
+        // Robust stat lookup
         ItemStat<?, ?> stat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
-        if (stat == null) {
-            return;
-        }
+        if (stat == null) stat = MMOItems.plugin.getStats().get("SCOLLECT_TIER");
+        if (stat == null) return;
 
         // Build the item momentarily to read its stats
         MMOItem mmoItem = template.newBuilder(0, null).build();
-        if (!mmoItem.hasData(stat)) {
-            return;
-        }
+        if (!mmoItem.hasData(stat)) return;
 
-        String requirement = ((StringData) mmoItem.getData(stat)).toString();
-
+        String requirement = mmoItem.getData(stat).toString();
         if (requirement == null || requirement.isEmpty()) return;
 
-        // Format: "collection_id - level"
         String[] parts = requirement.split(" - ");
         if (parts.length < 2) return;
 
@@ -106,11 +98,10 @@ public class MMOItemsCraftListener implements Listener {
         int currentTier = plugin.getPlayerDataManager().getTierLevel(player.getUniqueId(), collectionId);
 
         if (currentTier < requiredTier) {
-            // Block the item from appearing for standard crafting
             e.getInventory().setResult(new ItemStack(Material.AIR));
         }
 
-        // Delay 1 tick to also intercept MythicLib's custom recipe injection
+        // Sync check for late result (MythicLib)
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             ItemStack lateResult = e.getInventory().getResult();
             if (lateResult == null || lateResult.getType().isAir()) return;
@@ -118,30 +109,31 @@ public class MMOItemsCraftListener implements Listener {
             NBTItem lateNbt = NBTItem.get(lateResult);
             if (!lateNbt.hasTag("MMOITEMS_ITEM_ID")) return;
             
-            Type lateType = MMOItems.getType(lateNbt);
-            String lateId = MMOItems.getID(lateNbt);
+            Type lType = MMOItems.getType(lateNbt);
+            String lId = MMOItems.getID(lateNbt);
             
-            ItemStat<?, ?> lateStat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
-            if (lateStat == null) return;
+            ItemStat<?, ?> lStat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
+            if (lStat == null) lStat = MMOItems.plugin.getStats().get("SCOLLECT_TIER");
+            if (lStat == null) return;
             
-            MMOItemTemplate lateTemplate = MMOItems.plugin.getTemplates().getTemplate(lateType, lateId);
-            if (lateTemplate == null) return;
+            MMOItemTemplate lTemplate = MMOItems.plugin.getTemplates().getTemplate(lType, lId);
+            if (lTemplate == null) return;
             
-            MMOItem lateMmoItem = lateTemplate.newBuilder(0, null).build();
-            if (!lateMmoItem.hasData(lateStat)) return;
+            MMOItem lMmoItem = lTemplate.newBuilder(0, null).build();
+            if (!lMmoItem.hasData(lStat)) return;
 
-            String lateReq = ((StringData) lateMmoItem.getData(lateStat)).toString();
-            String[] lateParts = lateReq.split(" - ");
-            if (lateParts.length < 2) return;
+            String lReq = lMmoItem.getData(lStat).toString();
+            String[] lParts = lReq.split(" - ");
+            if (lParts.length < 2) return;
 
-            String lateColId = lateParts[0].trim().toLowerCase();
-            int lateTier = Integer.parseInt(lateParts[1].trim());
+            String lColId = lParts[0].trim().toLowerCase();
+            int lTier = Integer.parseInt(lParts[1].trim());
 
-            int lateCurrentTier = plugin.getPlayerDataManager().getTierLevel(player.getUniqueId(), lateColId);
+            int lCurrTier = plugin.getPlayerDataManager().getTierLevel(player.getUniqueId(), lColId);
             
-            if (lateCurrentTier < lateTier) {
+            if (lCurrTier < lTier) {
                 e.getInventory().setResult(new ItemStack(Material.AIR));
-                player.updateInventory(); // Force client update
+                player.updateInventory();
             }
         });
     }

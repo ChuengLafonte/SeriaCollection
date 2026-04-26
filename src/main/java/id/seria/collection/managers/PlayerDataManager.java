@@ -162,8 +162,6 @@ public class PlayerDataManager {
         
         if (collection != null) {
             addAmount(player, collection.getId(), item.getAmount());
-            // --- ANTI-EXPLOIT: Taint after gain ---
-            taintItem(item);
         }
     }
 

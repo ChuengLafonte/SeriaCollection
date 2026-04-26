@@ -12,8 +12,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Item;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class CollectionListener implements Listener {
@@ -46,28 +44,6 @@ public class CollectionListener implements Listener {
     public void onDrop(PlayerDropItemEvent e) {
         // Taint items when dropped by players
         plugin.getPlayerDataManager().taintItem(e.getItemDrop().getItemStack());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClick(InventoryClickEvent e) {
-        // Taint items when clicked/moved in ANY inventory (Chests, Player Inv, etc.)
-        if (e.getCurrentItem() != null) {
-            plugin.getPlayerDataManager().taintItem(e.getCurrentItem());
-        }
-        if (e.getCursor() != null) {
-            plugin.getPlayerDataManager().taintItem(e.getCursor());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryDrag(InventoryDragEvent e) {
-        // Taint items when dragged
-        if (e.getOldCursor() != null) {
-            plugin.getPlayerDataManager().taintItem(e.getOldCursor());
-        }
-        for (ItemStack item : e.getNewItems().values()) {
-            plugin.getPlayerDataManager().taintItem(item);
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
