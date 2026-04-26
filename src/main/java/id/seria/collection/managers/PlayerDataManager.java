@@ -134,11 +134,28 @@ public class PlayerDataManager {
         });
     }
 
+    public void handleCollectionGain(Player player, org.bukkit.entity.Item itemEntity) {
+        if (itemEntity == null) return;
+        
+        // 1. Check if the entity is tainted (dropped by player or container)
+        if (isTainted(itemEntity)) return;
+
+        // 2. Process the ItemStack normally
+        handleCollectionGain(player, itemEntity.getItemStack());
+    }
+
     public void handleCollectionGain(Player player, org.bukkit.inventory.ItemStack item) {
         if (item == null || item.getType().isAir()) return;
         
         // --- ANTI-EXPLOIT: Check Taint ---
-        if (isTainted(item)) return;
+        // --- ANTI-EXPLOIT: Check Taint ---
+        if (isTainted(item)) {
+            // Self-cleansing: Remove taint from ItemStack if it exists, 
+            // so it becomes a "pure" vanilla item again for the player.
+            cleanseItem(item);
+            return;
+        }
+
 
         id.seria.collection.models.Collection collection = null;
         
@@ -174,9 +191,35 @@ public class PlayerDataManager {
         item.setItemMeta(meta);
     }
 
+    /**
+     * NEW: Taint the ITEM ENTITY instead of the ITEMSTACK.
+     * This keeps the vanilla item "clean" (no NBT) while still preventing exploit on pickup.
+     */
+    public void taintEntity(org.bukkit.entity.Item itemEntity) {
+        if (itemEntity == null) return;
+        itemEntity.getPersistentDataContainer().set(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+    }
+
     public boolean isTainted(org.bukkit.inventory.ItemStack item) {
         if (item == null || item.getType().isAir() || !item.hasItemMeta()) return false;
         return item.getItemMeta().getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE);
+    }
+
+    /**
+     * Check if the entity itself is tainted.
+     */
+    public boolean isTainted(org.bukkit.entity.Item itemEntity) {
+        if (itemEntity == null) return false;
+        return itemEntity.getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE);
+    }
+
+    public void cleanseItem(org.bukkit.inventory.ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return;
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (meta.getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE)) {
+            meta.getPersistentDataContainer().remove(SeriaCollectionPlugin.DROPPED_ITEM_KEY);
+            item.setItemMeta(meta);
+        }
     }
 
     private void savePlayerData(UUID uuid, String collectionId, int amount) {

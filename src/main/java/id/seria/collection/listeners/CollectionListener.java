@@ -36,24 +36,21 @@ public class CollectionListener implements Listener {
     public void onPickup(org.bukkit.event.entity.EntityPickupItemEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
         
-        ItemStack item = e.getItem().getItemStack();
-        plugin.getPlayerDataManager().handleCollectionGain(player, item);
+        plugin.getPlayerDataManager().handleCollectionGain(player, e.getItem());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {
-        // Taint items when dropped by players
-        plugin.getPlayerDataManager().taintItem(e.getItemDrop().getItemStack());
+        // Taint the ITEM ENTITY when dropped by players, not the ItemStack metadata.
+        plugin.getPlayerDataManager().taintEntity(e.getItemDrop());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockDrop(BlockDropItemEvent e) {
-        // Tag items from containers as tainted
+        // Tag item entities from containers as tainted
         if (e.getBlock().getState() instanceof Container) {
-            for (Item itemEntity : e.getItems()) {
-                ItemStack stack = itemEntity.getItemStack();
-                plugin.getPlayerDataManager().taintItem(stack);
-                itemEntity.setItemStack(stack);
+            for (org.bukkit.entity.Item itemEntity : e.getItems()) {
+                plugin.getPlayerDataManager().taintEntity(itemEntity);
             }
         }
     }
