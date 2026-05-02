@@ -39,9 +39,9 @@ public class CollectionPlaceholderExpansion extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
 
-        // %seriacollection_level_<id>%
-        if (params.startsWith("level_")) {
-            String collId = params.replace("level_", "");
+        // %seriacollection_level_<id>% or %seriacollection_tier_<id>%
+        if (params.startsWith("level_") || params.startsWith("tier_")) {
+            String collId = params.replace("level_", "").replace("tier_", "");
             Collection collection = plugin.getCollectionManager().getCollection(collId);
             if (collection == null) return "0";
             

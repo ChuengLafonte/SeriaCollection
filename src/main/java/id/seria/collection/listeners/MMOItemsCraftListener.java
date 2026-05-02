@@ -133,8 +133,8 @@ public class MMOItemsCraftListener implements Listener {
             
             if (lCurrTier < lTier) {
                 e.getInventory().setResult(new ItemStack(Material.AIR));
-                player.updateInventory();
             }
+            player.updateInventory();
         });
     }
 
@@ -152,6 +152,7 @@ public class MMOItemsCraftListener implements Listener {
         String id = MMOItems.getID(nbt);
         
         ItemStat<?, ?> stat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
+        if (stat == null) stat = MMOItems.plugin.getStats().get("SCOLLECT_TIER");
         if (stat == null) return;
 
         MMOItem mmoItem = MMOItems.plugin.getTemplates().getTemplate(type, id).newBuilder(0, null).build();
@@ -168,6 +169,7 @@ public class MMOItemsCraftListener implements Listener {
 
         if (currentTier < requiredTier) {
             e.setCancelled(true);
+            player.sendMessage("§cAnda membutuhkan " + collectionId.toUpperCase() + " Tier " + requiredTier + " untuk craft ini!");
         }
     }
 
@@ -193,6 +195,7 @@ public class MMOItemsCraftListener implements Listener {
         String id = MMOItems.getID(nbt);
         
         ItemStat<?, ?> stat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
+        if (stat == null) stat = MMOItems.plugin.getStats().get("SCOLLECT_TIER");
         if (stat == null) return;
 
         MMOItem mmoItem = MMOItems.plugin.getTemplates().getTemplate(type, id).newBuilder(0, null).build();
@@ -233,6 +236,7 @@ public class MMOItemsCraftListener implements Listener {
         String id = idBuilder.toString().toUpperCase();
 
         ItemStat<?, ?> stat = MMOItems.plugin.getStats().get("CUSTOM_SCOLLECT_TIER");
+        if (stat == null) stat = MMOItems.plugin.getStats().get("SCOLLECT_TIER");
         if (stat == null) return;
 
         MMOItemTemplate template = MMOItems.plugin.getTemplates().getTemplate(type, id);

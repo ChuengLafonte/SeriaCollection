@@ -40,6 +40,22 @@ public class CollectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockBreak(org.bukkit.event.block.BlockBreakEvent e) {
+        Player player = e.getPlayer();
+        if (player.getGameMode() == org.bukkit.GameMode.CREATIVE) return;
+
+        // If dropItems is false, it means a plugin (like BlockRegen) is handling the drops.
+        // We calculate what would have dropped and award points now.
+        if (!e.isDropItems()) {
+            java.util.Collection<ItemStack> drops = e.getBlock().getDrops(player.getInventory().getItemInMainHand());
+            for (ItemStack drop : drops) {
+                if (drop == null || drop.getType().isAir()) continue;
+                plugin.getPlayerDataManager().handleCollectionGain(player, drop);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {
         // Taint the ITEM ENTITY when dropped by players, not the ItemStack metadata.
         plugin.getPlayerDataManager().taintEntity(e.getItemDrop());

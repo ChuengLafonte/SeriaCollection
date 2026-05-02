@@ -3,7 +3,7 @@ version: ${project.version}
 main: id.seria.collection.SeriaCollectionPlugin
 api-version: '1.21'
 author: Seria
-description: Hypixel-style Collection system
+description: Collection System for tracking materials in Project Seria Servers
 depend: [SeriaCore]
 commands:
   collect:

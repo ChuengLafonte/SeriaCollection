@@ -112,7 +112,7 @@ public class CollectionManager {
 
     public Collection getCollection(String id) {
         if (id == null) return null;
-        return collectionsById.get(id.toLowerCase());
+        return collectionsById.get(id.trim().toLowerCase());
     }
 
     public Collection getCollectionByMaterial(Material material) {

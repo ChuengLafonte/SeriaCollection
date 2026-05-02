@@ -49,22 +49,29 @@ public class PlayerDataManager {
         
         try {
             Connection conn = id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().getConnection();
-            if (conn == null) return;
+            if (conn == null) {
+                plugin.getLogger().warning("Could not load player data for " + uuid + ": Connection is null!");
+                return;
+            }
             
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    data.put(rs.getString("collection_id"), rs.getInt("amount"));
+                    data.put(rs.getString("collection_id").toLowerCase(), rs.getInt("amount"));
                 }
             }
+            // plugin.getLogger().info("Loaded " + data.size() + " collections for player " + uuid);
         } catch (SQLException e) {
+            plugin.getLogger().severe("SQL Error loading player data for " + uuid + ": " + e.getMessage());
             e.printStackTrace();
         }
         cache.put(uuid, data);
     }
 
     public int getAmount(UUID uuid, String collectionId) {
+        if (collectionId == null) return 0;
+        collectionId = collectionId.trim().toLowerCase();
         Map<String, Integer> data = cache.get(uuid);
         if (data == null) {
             loadPlayerData(uuid);
@@ -102,6 +109,18 @@ public class PlayerDataManager {
 
     public void resetCollection(Player player, String collectionId) {
         UUID uuid = player.getUniqueId();
+        
+        // Revoke rewards before resetting
+        Collection collection = plugin.getCollectionManager().getCollection(collectionId);
+        if (collection != null) {
+            int currentTier = getTierLevel(uuid, collectionId);
+            for (Tier tier : collection.getTiers().values()) {
+                if (tier.getLevel() <= currentTier) {
+                    revokeRewards(player, tier.getRewards());
+                }
+            }
+        }
+
         Map<String, Integer> data = cache.get(uuid);
         if (data != null) {
             data.remove(collectionId);
@@ -121,6 +140,23 @@ public class PlayerDataManager {
 
     public void resetAllCollections(Player player) {
         UUID uuid = player.getUniqueId();
+        
+        // Revoke all rewards before resetting
+        Map<String, Integer> data = cache.get(uuid);
+        if (data != null) {
+            for (String collectionId : data.keySet()) {
+                Collection collection = plugin.getCollectionManager().getCollection(collectionId);
+                if (collection != null) {
+                    int currentTier = getTierLevel(uuid, collectionId);
+                    for (Tier tier : collection.getTiers().values()) {
+                        if (tier.getLevel() <= currentTier) {
+                            revokeRewards(player, tier.getRewards());
+                        }
+                    }
+                }
+            }
+        }
+
         cache.remove(uuid);
         
         id.seria.core.SeriaCorePlugin.getInstance().getPlayerDataManager().runAsync(conn -> {
@@ -132,6 +168,22 @@ public class PlayerDataManager {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void revokeRewards(Player player, List<String> rewards) {
+        for (String reward : rewards) {
+            if (reward.startsWith("fortune: ")) {
+                String value = reward.substring(9).trim();
+                String[] args = value.split(" ");
+                if (args.length >= 2) {
+                    String type = args[0];
+                    try {
+                        int amount = Integer.parseInt(args[1]);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sfortune remove " + player.getName() + " " + type + " " + amount);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
     }
 
     public void handleCollectionGain(Player player, org.bukkit.entity.Item itemEntity) {
@@ -148,10 +200,7 @@ public class PlayerDataManager {
         if (item == null || item.getType().isAir()) return;
         
         // --- ANTI-EXPLOIT: Check Taint ---
-        // --- ANTI-EXPLOIT: Check Taint ---
         if (isTainted(item)) {
-            // Self-cleansing: Remove taint from ItemStack if it exists, 
-            // so it becomes a "pure" vanilla item again for the player.
             cleanseItem(item);
             return;
         }
@@ -165,8 +214,8 @@ public class PlayerDataManager {
                 io.lumine.mythic.lib.api.item.NBTItem nbtItem = io.lumine.mythic.lib.api.item.NBTItem.get(item);
                 if (nbtItem.hasType()) {
                     String type = nbtItem.getType();
-                    String id = nbtItem.getString("MMOITEMS_ITEM_ID");
-                    collection = plugin.getCollectionManager().getCollectionByMmoId(type + ":" + id);
+                    String mmoId = nbtItem.getString("MMOITEMS_ITEM_ID");
+                    collection = plugin.getCollectionManager().getCollectionByMmoId(type + ":" + mmoId);
                 }
             }
         } catch (NoClassDefFoundError ignored) {
@@ -182,6 +231,11 @@ public class PlayerDataManager {
         }
     }
 
+    public void taintEntity(org.bukkit.entity.Item itemEntity) {
+        if (itemEntity == null) return;
+        itemEntity.getPersistentDataContainer().set(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+    }
+
     public void taintItem(org.bukkit.inventory.ItemStack item) {
         if (item == null || item.getType().isAir()) return;
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
@@ -191,23 +245,11 @@ public class PlayerDataManager {
         item.setItemMeta(meta);
     }
 
-    /**
-     * NEW: Taint the ITEM ENTITY instead of the ITEMSTACK.
-     * This keeps the vanilla item "clean" (no NBT) while still preventing exploit on pickup.
-     */
-    public void taintEntity(org.bukkit.entity.Item itemEntity) {
-        if (itemEntity == null) return;
-        itemEntity.getPersistentDataContainer().set(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
-    }
-
     public boolean isTainted(org.bukkit.inventory.ItemStack item) {
         if (item == null || item.getType().isAir() || !item.hasItemMeta()) return false;
         return item.getItemMeta().getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE);
     }
 
-    /**
-     * Check if the entity itself is tainted.
-     */
     public boolean isTainted(org.bukkit.entity.Item itemEntity) {
         if (itemEntity == null) return false;
         return itemEntity.getPersistentDataContainer().has(SeriaCollectionPlugin.DROPPED_ITEM_KEY, org.bukkit.persistence.PersistentDataType.BYTE);
@@ -230,7 +272,9 @@ public class PlayerDataManager {
                 ps.setString(2, collectionId);
                 ps.setInt(3, amount);
                 ps.executeUpdate();
+                // plugin.getLogger().info("[DEBUG] DB Save Successful: " + uuid + " / " + collectionId + " = " + amount);
             } catch (SQLException e) {
+                plugin.getLogger().severe("DB Save Error: " + e.getMessage());
                 e.printStackTrace();
             }
         });
@@ -298,17 +342,18 @@ public class PlayerDataManager {
     public int getTierLevel(UUID uuid, String collectionId) {
         int amount = getAmount(uuid, collectionId);
         Collection collection = plugin.getCollectionManager().getCollection(collectionId);
+        
         if (collection == null) return 0;
 
-        int currentTier = 0;
+        int currentLevel = 0;
         for (Tier tier : collection.getTiers().values()) {
             if (amount >= tier.getRequirement()) {
-                currentTier = tier.getLevel();
+                currentLevel = tier.getLevel();
             } else {
                 break;
             }
         }
-        return currentTier;
+        return currentLevel;
     }
 
     public void unloadPlayerData(UUID uuid) {
