@@ -1,9 +1,13 @@
 ﻿target/
 lib/
+build/
+.gradle/
+.vscode/
+bin/
+out/
 *.log
 .idea/
 *.iml
-.vscode/
 .project
 .classpath
 .settings/

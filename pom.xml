@@ -6,7 +6,7 @@
 
     <groupId>id.seria</groupId>
     <artifactId>seriacollection</artifactId>
-    <version>v1.2.1</version>
+    <version>1.2.2</version>
     <packaging>jar</packaging>
 
     <name>SeriaCollection</name>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>id.seria</groupId>
             <artifactId>seriacore</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -104,3 +104,5 @@
         </resources>
     </build>
 </project>
+
+
