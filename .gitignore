@@ -1,5 +1,12 @@
 ﻿target/
+lib/
+*.log
 .idea/
-.gemini/
 *.iml
 .vscode/
+.project
+.classpath
+.settings/
+.factorypath
+.DS_Store
+Thumbs.db
