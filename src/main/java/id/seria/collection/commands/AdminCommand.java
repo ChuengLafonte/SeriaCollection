@@ -33,6 +33,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<yellow>SeriaCollection Admin Commands:"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect reload"));
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect debug"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect set <player> <collection_id> <amount>"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect reset <player> <collection_id|all>"));
             return true;
@@ -41,6 +42,15 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         if (args[0].equalsIgnoreCase("reload")) {
             plugin.getConfigManager().reloadConfigs();
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("reload-success")));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("debug")) {
+            boolean newState = !SeriaCollectionPlugin.isDebugMode();
+            SeriaCollectionPlugin.setDebugMode(newState);
+            String status = newState ? "<green>ENABLED" : "<red>DISABLED";
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(
+                "<yellow>[SeriaCollection] <gray>Debug mode: " + status));
             return true;
         }
 
@@ -147,7 +157,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return List.of("reload", "set", "forcetier", "reset").stream()
+            return List.of("reload", "debug", "set", "forcetier", "reset").stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }

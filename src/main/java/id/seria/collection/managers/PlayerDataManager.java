@@ -92,6 +92,8 @@ public class PlayerDataManager {
         int next = current + amount;
         data.put(collectionId, next);
 
+        SeriaCollectionPlugin.debug("addAmount: player=" + player.getName() + " collectionId=" + collectionId + " amount=" + amount + " (" + current + " -> " + next + ")");
+
         // Async save
         savePlayerData(uuid, collectionId, next);
 
@@ -190,7 +192,10 @@ public class PlayerDataManager {
         if (itemEntity == null) return;
         
         // 1. Check if the entity is tainted (dropped by player or container)
-        if (isTainted(itemEntity)) return;
+        if (isTainted(itemEntity)) {
+            SeriaCollectionPlugin.debug("Skipping tainted entity: " + itemEntity.getItemStack().getType() + " (player=" + player.getName() + ")");
+            return;
+        }
 
         // 2. Process the ItemStack normally
         handleCollectionGain(player, itemEntity.getItemStack());
@@ -201,6 +206,7 @@ public class PlayerDataManager {
         
         // --- ANTI-EXPLOIT: Check Taint ---
         if (isTainted(item)) {
+            SeriaCollectionPlugin.debug("Skipping tainted ItemStack: " + item.getType() + " (player=" + player.getName() + ")");
             cleanseItem(item);
             return;
         }
@@ -216,6 +222,7 @@ public class PlayerDataManager {
                     String type = nbtItem.getType();
                     String mmoId = nbtItem.getString("MMOITEMS_ITEM_ID");
                     collection = plugin.getCollectionManager().getCollectionByMmoId(type + ":" + mmoId);
+                    SeriaCollectionPlugin.debug("MMOItem detected: " + type + ":" + mmoId + " -> collection=" + (collection != null ? collection.getId() : "null"));
                 }
             }
         } catch (NoClassDefFoundError ignored) {
@@ -224,6 +231,7 @@ public class PlayerDataManager {
         // 2. Fallback to Material Tracking
         if (collection == null) {
             collection = plugin.getCollectionManager().getCollectionByMaterial(item.getType());
+            SeriaCollectionPlugin.debug("Material lookup: " + item.getType() + " -> collection=" + (collection != null ? collection.getId() : "null") + " (player=" + player.getName() + ")");
         }
         
         if (collection != null) {

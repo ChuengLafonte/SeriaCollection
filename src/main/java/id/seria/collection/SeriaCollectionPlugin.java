@@ -21,6 +21,7 @@ public class SeriaCollectionPlugin extends JavaPlugin {
     private static SeriaCollectionPlugin instance;
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     public static NamespacedKey DROPPED_ITEM_KEY;
+    private static boolean debugMode = false;
     
     private ConfigManager configManager;
     private CollectionManager collectionManager;
@@ -115,6 +116,20 @@ public class SeriaCollectionPlugin extends JavaPlugin {
 
     public static MiniMessage getMiniMessage() {
         return MINI_MESSAGE;
+    }
+
+    public static boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public static void setDebugMode(boolean value) {
+        debugMode = value;
+    }
+
+    public static void debug(String message) {
+        if (debugMode && instance != null) {
+            instance.getLogger().info("[DEBUG] " + message);
+        }
     }
 
     public ConfigManager getConfigManager() {
