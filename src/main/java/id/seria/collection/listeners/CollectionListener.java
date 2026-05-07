@@ -36,7 +36,16 @@ public class CollectionListener implements Listener {
     public void onPickup(org.bukkit.event.entity.EntityPickupItemEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
         
+        // OPTIMIZATION: Check taint first before doing anything else
+        // This makes the listener near-zero cost for already-processed items (Tree, Farm, Mining, Combat)
+        if (plugin.getPlayerDataManager().isTainted(e.getItem())) {
+            return;
+        }
+
         plugin.getPlayerDataManager().handleCollectionGain(player, e.getItem());
+        
+        // Taint after gain to prevent double counting if dropped again
+        plugin.getPlayerDataManager().taintEntity(e.getItem());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -44,30 +53,36 @@ public class CollectionListener implements Listener {
         Player player = e.getPlayer();
         if (player.getGameMode() == org.bukkit.GameMode.CREATIVE) return;
 
-        // If dropItems is false, it means a plugin (like BlockRegen) is handling the drops.
-        // We calculate what would have dropped and award points now.
-        if (!e.isDropItems()) {
-            java.util.Collection<ItemStack> drops = e.getBlock().getDrops(player.getInventory().getItemInMainHand());
-            for (ItemStack drop : drops) {
-                if (drop == null || drop.getType().isAir()) continue;
-                plugin.getPlayerDataManager().handleCollectionGain(player, drop);
-            }
+        java.util.Collection<ItemStack> drops = e.getBlock().getDrops(player.getInventory().getItemInMainHand());
+        for (ItemStack drop : drops) {
+            if (drop == null || drop.getType().isAir()) continue;
+            plugin.getPlayerDataManager().handleCollectionGain(player, drop);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityDeath(org.bukkit.event.entity.EntityDeathEvent e) {
+        Player killer = e.getEntity().getKiller();
+        if (killer == null) return;
+
+        // 1. Award points for all drops directly to the killer
+        // 2. Taint the ItemStacks so they are ignored by pickup listener
+        for (ItemStack drop : e.getDrops()) {
+            if (drop == null || drop.getType().isAir()) continue;
+            plugin.getPlayerDataManager().handleCollectionGain(killer, drop);
+            plugin.getPlayerDataManager().taintItem(drop);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {
-        // Taint the ITEM ENTITY when dropped by players, not the ItemStack metadata.
         plugin.getPlayerDataManager().taintEntity(e.getItemDrop());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockDrop(BlockDropItemEvent e) {
-        // Tag item entities from containers as tainted
-        if (e.getBlock().getState() instanceof Container) {
-            for (org.bukkit.entity.Item itemEntity : e.getItems()) {
-                plugin.getPlayerDataManager().taintEntity(itemEntity);
-            }
+    public void onBlockDrop(org.bukkit.event.block.BlockDropItemEvent e) {
+        for (org.bukkit.entity.Item itemEntity : e.getItems()) {
+            plugin.getPlayerDataManager().taintEntity(itemEntity);
         }
     }
 

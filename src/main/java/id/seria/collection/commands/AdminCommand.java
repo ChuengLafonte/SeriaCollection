@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,11 +37,13 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect debug"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect set <player> <collection_id> <amount>"));
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect reset <player> <collection_id|all>"));
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<gray>/scollect resetminion <player> <minion_id|all>"));
             return true;
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
             plugin.getConfigManager().reloadConfigs();
+            plugin.getRecipeBookManager().clearCache();
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("reload-success")));
             return true;
         }
@@ -150,6 +153,24 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(msg));
             return true;
         }
+        if (args[0].equalsIgnoreCase("resetminion") && args.length >= 3) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) {
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize(plugin.getConfigManager().getMessage("player-not-found")));
+                return true;
+            }
+
+            String minionId = args[2];
+            if (minionId.equalsIgnoreCase("all")) {
+                plugin.getPlayerDataManager().resetAllMinions(target);
+                sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<green>Successfully reset ALL minion crafts for <white>" + target.getName()));
+                return true;
+            }
+
+            plugin.getPlayerDataManager().resetMinion(target, minionId);
+            sender.sendMessage(SeriaCollectionPlugin.getMiniMessage().deserialize("<green>Successfully reset minion craft <white>" + minionId + " <green>for <white>" + target.getName()));
+            return true;
+        }
 
         return true;
     }
@@ -157,23 +178,32 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return List.of("reload", "debug", "set", "forcetier", "reset").stream()
+            return List.of("reload", "debug", "set", "forcetier", "reset", "resetminion").stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
-        if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset"))) {
+        if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("resetminion"))) {
             return null; // Return null for player list
         }
 
-        if (args.length == 3 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset"))) {
+        if (args.length == 3 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("forcetier") || args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("resetminion"))) {
             List<String> suggestions = new ArrayList<>();
-            if (args[0].equalsIgnoreCase("reset")) {
+            if (args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("resetminion")) {
                 suggestions.add("all");
             }
-            suggestions.addAll(plugin.getCollectionManager().getCategories().values().stream()
-                    .flatMap(c -> c.getCollections().keySet().stream())
-                    .collect(Collectors.toList()));
+            
+            if (args[0].equalsIgnoreCase("resetminion")) {
+                // Get minion IDs from config
+                ConfigurationSection displays = plugin.getConfigManager().getMinionsConfig().getConfigurationSection("displays");
+                if (displays != null) {
+                    suggestions.addAll(displays.getKeys(false));
+                }
+            } else {
+                suggestions.addAll(plugin.getCollectionManager().getCategories().values().stream()
+                        .flatMap(c -> c.getCollections().keySet().stream())
+                        .collect(Collectors.toList()));
+            }
             
             return suggestions.stream()
                     .filter(s -> s.startsWith(args[2].toLowerCase()))

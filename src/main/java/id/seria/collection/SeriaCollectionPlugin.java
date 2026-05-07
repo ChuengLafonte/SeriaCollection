@@ -5,6 +5,7 @@ import id.seria.collection.commands.AdminCommand;
 import id.seria.collection.listeners.CollectionListener;
 import id.seria.collection.listeners.MMOItemsCraftListener;
 import id.seria.collection.listeners.MenuListener;
+import id.seria.collection.listeners.MinionCraftListener;
 import id.seria.collection.integration.mmoitems.SCollectRequirementStat;
 import id.seria.collection.managers.*;
 import id.seria.collection.placeholders.CollectionPlaceholderExpansion;
@@ -27,6 +28,7 @@ public class SeriaCollectionPlugin extends JavaPlugin {
     private CollectionManager collectionManager;
     private PlayerDataManager playerDataManager;
     private GuiManager guiManager;
+    private RecipeBookManager recipeBookManager;
 
     @Override
     public void onEnable() {
@@ -55,11 +57,18 @@ public class SeriaCollectionPlugin extends JavaPlugin {
             this.playerDataManager = new PlayerDataManager(this);
             this.collectionManager = new CollectionManager(this);
             this.guiManager = new GuiManager(this);
+            this.recipeBookManager = new RecipeBookManager(this);
+            logger.info("RecipeBookManager initialized.");
 
             // Register Listeners
             logger.info("Registering Listeners...");
             getServer().getPluginManager().registerEvents(new CollectionListener(this), this);
             getServer().getPluginManager().registerEvents(new MenuListener(), this);
+
+            if (Bukkit.getPluginManager().isPluginEnabled("TopMinion")) {
+                getServer().getPluginManager().registerEvents(new MinionCraftListener(this), this);
+                logger.info("TopMinion integration listener registered!");
+            }
             
             // Register MMOItems Integration
             if (Bukkit.getPluginManager().isPluginEnabled("MMOItems")) {
@@ -89,6 +98,10 @@ public class SeriaCollectionPlugin extends JavaPlugin {
                 getCommand("seriacollection").setTabCompleter(adminCommand);
             } else {
                 logger.severe("Command /seriacollection not found in plugin.yml!");
+            }
+
+            if (getCommand("recipes") != null) {
+                getCommand("recipes").setExecutor(new id.seria.collection.commands.RecipeCommand(this));
             }
 
             // Register PAPI
@@ -148,5 +161,9 @@ public class SeriaCollectionPlugin extends JavaPlugin {
 
     public GuiManager getGuiManager() {
         return guiManager;
+    }
+
+    public RecipeBookManager getRecipeBookManager() {
+        return recipeBookManager;
     }
 }

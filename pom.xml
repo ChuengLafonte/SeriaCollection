@@ -36,6 +36,10 @@
             <id>phoenix</id>
             <url>https://nexus.phoenixdevt.fr/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>unnamed</id>
+            <url>https://repo.unnamed.team/repository/unnamed-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -79,6 +83,19 @@
             <groupId>id.seria</groupId>
             <artifactId>seriacore</artifactId>
             <version>1.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TopMinions API -->
+        <dependency>
+            <groupId>com.sarry20</groupId>
+            <artifactId>TopMinion</artifactId>
+            <version>2.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>id.seria</groupId>
+            <artifactId>SeriaCrafting</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

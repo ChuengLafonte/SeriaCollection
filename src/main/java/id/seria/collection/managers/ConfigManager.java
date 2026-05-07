@@ -5,16 +5,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigManager {
 
     private final SeriaCollectionPlugin plugin;
-    private FileConfiguration collectionsConfig;
+    private FileConfiguration collectionsConfig; // Legacy or main order
     private FileConfiguration messagesConfig;
     private FileConfiguration guisConfig;
-    private File collectionsFile;
-    private File messagesFile;
-    private File guisFile;
+    private FileConfiguration minionsConfig;
+    private final List<FileConfiguration> collectionFiles = new ArrayList<>();
 
     public ConfigManager(SeriaCollectionPlugin plugin) {
         this.plugin = plugin;
@@ -22,32 +23,51 @@ public class ConfigManager {
 
     public void loadConfigs() {
         plugin.saveDefaultConfig();
+        this.collectionsConfig = loadConfig("collections.yml");
+        this.messagesConfig = loadConfig("messages.yml");
+        this.guisConfig = loadConfig("guis.yml");
+        this.minionsConfig = loadConfig("minions.yml");
         
-        collectionsFile = new File(plugin.getDataFolder(), "collections.yml");
-        if (!collectionsFile.exists()) {
-            plugin.saveResource("collections.yml", false);
-        }
-        collectionsConfig = YamlConfiguration.loadConfiguration(collectionsFile);
+        loadCollectionFolder();
+    }
 
-        messagesFile = new File(plugin.getDataFolder(), "messages.yml");
-        if (!messagesFile.exists()) {
-            plugin.saveResource("messages.yml", false);
+    private void loadCollectionFolder() {
+        collectionFiles.clear();
+        File folder = new File(plugin.getDataFolder(), "collections");
+        if (!folder.exists()) {
+            folder.mkdirs();
+            // Simpan file contoh jika folder baru dibuat
+            plugin.saveResource("collections/farming.yml", false);
         }
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
 
-        guisFile = new File(plugin.getDataFolder(), "guis.yml");
-        if (!guisFile.exists()) {
-            plugin.saveResource("guis.yml", false);
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".yml"));
+        if (files != null) {
+            for (File file : files) {
+                collectionFiles.add(YamlConfiguration.loadConfiguration(file));
+            }
         }
-        guisConfig = YamlConfiguration.loadConfiguration(guisFile);
+    }
+
+    private FileConfiguration loadConfig(String fileName) {
+        File file = new File(plugin.getDataFolder(), fileName);
+        if (!file.exists()) {
+            plugin.saveResource(fileName, false);
+        }
+        return YamlConfiguration.loadConfiguration(file);
     }
 
     public void reloadConfigs() {
         plugin.reloadConfig();
-        collectionsConfig = YamlConfiguration.loadConfiguration(collectionsFile);
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
-        guisConfig = YamlConfiguration.loadConfiguration(guisFile);
-        plugin.getCollectionManager().loadCollections(); // Refresh collections in memory
+        this.collectionsConfig = loadConfig("collections.yml");
+        this.messagesConfig = loadConfig("messages.yml");
+        this.guisConfig = loadConfig("guis.yml");
+        this.minionsConfig = loadConfig("minions.yml");
+        loadCollectionFolder();
+        plugin.getCollectionManager().loadCollections();
+    }
+
+    public List<FileConfiguration> getCollectionFiles() {
+        return collectionFiles;
     }
 
     public FileConfiguration getCollectionsConfig() {
@@ -64,5 +84,9 @@ public class ConfigManager {
 
     public String getMessage(String path) {
         return messagesConfig.getString(path, path);
+    }
+
+    public FileConfiguration getMinionsConfig() {
+        return minionsConfig;
     }
 }

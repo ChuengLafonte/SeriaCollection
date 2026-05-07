@@ -1,0 +1,48 @@
+# ======================================================
+# SeriaCollection - Minion System Configuration
+# ======================================================
+
+# Milestone hadiah slot minion berdasarkan jumlah unik minion yang telah di-craft.
+# Format: JUMLAH_UNIK: MILESTONE_LEVEL
+# MILESTONE_LEVEL akan memberikan permission: seria.topminion.<level>
+# Pastikan level ini selaras dengan konfigurasi permission di plugin TopMinion.
+milestones:
+  5: 2
+  15: 3
+  30: 4
+  50: 5
+  75: 6
+  100: 7
+  125: 8
+  150: 9
+  175: 10
+  200: 11
+  225: 12
+  250: 13
+  262: 14
+
+# Konfigurasi tampilan ikon minion di dalam menu Crafted Minions.
+# Properti:
+#   material: Material item (Default: PLAYER_HEAD)
+#   head-value: Texture value jika menggunakan PLAYER_HEAD
+#   display-name: Nama yang tampil di GUI
+#   internal-id: ID asli minion di TopMinion (Gunakan ini jika nama kunci berbeda dengan ID sistem)
+#   max-tiers: Jumlah level yang akan ditampilkan di lore (Default: 12)
+
+displays:
+  COAL:
+    material: PLAYER_HEAD
+    head-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjY0ZDA4ZWU5YjY2MTFjYmU1NjJjYjZlNmY4YmY0N2QwZmFkYTA2ZGU1Nzc2ZGU5ZWM5MWRmMGVkNWFmYmI5In19fQ=="
+    display-name: "Coal Minion"
+    max-tiers: 11
+  OAK:
+    material: PLAYER_HEAD
+    head-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTRjNGVjNDIyM2E1YTMzYjI1MGEyZDJjMTY1Yzg2N2E0NGRkZWY1YzY4YTJhYjFhNGZlZGUzM2Q1Y2RkIn19fQ=="
+    display-name: "Oak Minion"
+    internal-id: oak_log
+    max-tiers: 11
+  COBBLESTONE:
+    material: PLAYER_HEAD
+    head-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjljMzhmZTRmYzk4YTI0ODA3OWNkMDRjNjViNmJmZjliNDUwMTdmMTY0NjBkYWIzYzM0YzE3YmZjM2VlMWQyZiJ9fX0="
+    display-name: "Cobblestone Minion"
+    max-tiers: 11

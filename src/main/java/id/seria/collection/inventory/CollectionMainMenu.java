@@ -126,10 +126,12 @@ public class CollectionMainMenu implements InventoryHolder, Listener {
             int catPercent = (catTotal == 0) ? 0 : (catUnlocked * 100 / catTotal);
             
             for (String line : footerLines) {
+                String bar = GuiUtils.getProgressBar(catUnlocked, catTotal);
                 lore.add(GuiUtils.format(line
                     .replace("%percentage%", String.valueOf(catPercent))
                     .replace("%unlocked%", String.valueOf(catUnlocked))
-                    .replace("%total%", String.valueOf(catTotal))));
+                    .replace("%total%", String.valueOf(catTotal))
+                    .replace("%progress_bar%", bar)));
             }
             
             meta.lore(lore);
@@ -137,6 +139,29 @@ public class CollectionMainMenu implements InventoryHolder, Listener {
             
             inventory.setItem(slots.get(i), item);
             i++;
+        }
+
+        // Crafted Minions Button
+        ConfigurationSection minionCfg = config.getConfigurationSection("items.crafted-minions");
+        if (minionCfg != null) {
+            ItemStack minionItem;
+            String matStr = minionCfg.getString("material", "PLAYER_HEAD");
+            if (matStr.equalsIgnoreCase("PLAYER_HEAD") && minionCfg.contains("head-value")) {
+                minionItem = GuiUtils.createCustomHead(minionCfg.getString("head-value"));
+            } else {
+                minionItem = new ItemStack(Material.valueOf(matStr));
+            }
+            
+            ItemMeta minionMeta = minionItem.getItemMeta();
+            minionMeta.displayName(GuiUtils.format(minionCfg.getString("name", "")));
+            
+            List<Component> minionLore = new ArrayList<>();
+            for (String line : minionCfg.getStringList("lore")) {
+                minionLore.add(GuiUtils.format(line));
+            }
+            minionMeta.lore(minionLore);
+            minionItem.setItemMeta(minionMeta);
+            inventory.setItem(minionCfg.getInt("slot", 23), minionItem);
         }
     }
 
@@ -164,8 +189,14 @@ public class CollectionMainMenu implements InventoryHolder, Listener {
             for (Category category : categories.values()) {
                 if (clicked.getType() == category.getIcon()) {
                     new CategoryMenu(plugin, category).open(player);
-                    break;
+                    return;
                 }
+            }
+
+            int minionSlot = config.getInt("items.crafted-minions.slot", 23);
+            if (event.getSlot() == minionSlot) {
+                new MinionCraftedMenu(plugin, player, 0).open();
+                return;
             }
         }
     }

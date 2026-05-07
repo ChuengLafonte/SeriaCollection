@@ -1,0 +1,28 @@
+# ======================================================
+# SeriaCollection - Farming Category
+# ======================================================
+
+oak_log:
+  name: "Oak Log"
+  material: OAK_LOG
+  category: FARMING
+  tiers:
+    1:
+      requirement: 50
+      rewards:
+        - "exp: farming 100"
+    2:
+      requirement: 250
+      rewards:
+        - "exp: farming 500"
+        - "cmd: give %player% diamond 1"
+
+wheat:
+  name: "Wheat"
+  material: WHEAT
+  category: FARMING
+  tiers:
+    1:
+      requirement: 100
+      rewards:
+        - "exp: farming 200"

@@ -1,34 +1,29 @@
 package id.seria.collection.commands;
 
 import id.seria.collection.SeriaCollectionPlugin;
-import id.seria.collection.inventory.MinionCraftedMenu;
+import id.seria.collection.inventory.RecipeBookMainMenu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class CollectCommand implements CommandExecutor {
+public class RecipeCommand implements CommandExecutor {
 
     private final SeriaCollectionPlugin plugin;
 
-    public CollectCommand(SeriaCollectionPlugin plugin) {
+    public RecipeCommand(SeriaCollectionPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command can only be used by players.");
+            sender.sendMessage("Hanya pemain yang bisa menggunakan command ini!");
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("minions")) {
-            new MinionCraftedMenu(plugin, player, 0).open();
-            return true;
-        }
-
-        plugin.getGuiManager().openMainMenu(player);
+        new RecipeBookMainMenu(plugin).open(player);
         return true;
     }
 }

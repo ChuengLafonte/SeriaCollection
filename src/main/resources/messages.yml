@@ -1,19 +1,30 @@
-prefix: "<dark_gray>[<yellow>Collection<dark_gray>] "
-no-permission: "<red>Anda tidak memiliki izin untuk menggunakan perintah ini!"
-reload-success: "<prefix><green>Konfigurasi berhasil dimuat ulang!"
-progress: "<prefix><gray>Anda mengumpulkan <yellow>%amount% %item%<gray>! (<white>%current%/%next%<gray>)"
-invalid-collection: "<prefix><red>ID Koleksi tidak valid!"
-player-not-found: "<prefix><red>Pemain tidak ditemukan!"
-set-success: "<prefix><green>Berhasil mengatur koleksi <white>%item% <yellow>%player% menjadi <yellow>%amount%<white>."
-forcetier-success: "<prefix><green>Berhasil memaksa <white>%player% <green>mencapai <white>%item% Tier %tier%<green>!"
+# ======================================================
+# SeriaCollection - Messages Configuration
+# ======================================================
 
-tier-up:
-  message:
-    - "<strikethrough><yellow>                                                             </yellow></strikethrough>"
-    - "<gold><b>TINGKAT KOLEKSI NAIK </b><white>%collection% %tier_change%"
-    - ""
-    - "<green><b>HADIAH</b>"
-    - "%rewards%"
-    - "<strikethrough><yellow>                                                             </yellow></strikethrough>"
-  reward-format: "<green>  ✔ <gray>%reward%"
-  no-rewards: "<gray>  <i>Tidak ada</i>"
+no-permission: "<red>Anda tidak memiliki izin untuk melakukan ini!"
+player-not-found: "<red>Pemain tidak ditemukan!"
+invalid-collection: "<red>ID Koleksi tidak valid!"
+reload-success: "<green>Konfigurasi berhasil dimuat ulang!"
+set-success: "<green>Berhasil mengubah koleksi %item% milik %player% menjadi %amount%."
+reset-success: "<green>Berhasil mereset koleksi %item% milik %player%."
+reset-all-success: "<green>Berhasil mereset SEMUA koleksi milik %player%."
+
+# Notifikasi Naik Tier (Gambar 1)
+# Variabel: %collection%, %old_roman%, %new_roman%, %rewards%
+tier-up-broadcast:
+  - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+  - "<gold><bold>COLLECTION LEVEL UP </bold><white>%collection% %old_roman%<gray>➜<white>%new_roman%"
+  - "<green><bold>REWARDS</bold>"
+  - "%rewards%"
+  - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+# Notifikasi Craft Minion Baru (Gambar 2)
+# Variabel: %tier%, %minion%, %needed%, %next_slot%
+minion-new-craft:
+  - "<green>You crafted a Tier %tier% %minion% Minion! That's a new one!"
+  - "<gray>Craft <white>%needed% <gray>more unique Minions to unlock your <white>%next_slot%th <gray>Minion slot!"
+
+# Notifikasi Unlock Slot (Gambar 3)
+# Variabel: %slot%
+minion-slot-unlock: "<gold>You have now unlocked your %slot%th Minion slot!"

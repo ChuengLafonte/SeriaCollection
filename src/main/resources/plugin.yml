@@ -5,6 +5,7 @@ api-version: '1.21'
 author: Seria
 description: Collection System for tracking materials in Project Seria Servers
 depend: [SeriaCore]
+softdepend: [MMOItems, TopMinion]
 commands:
   collect:
     description: Open the collection menu
@@ -13,6 +14,10 @@ commands:
     description: Admin commands for SeriaCollection
     aliases: [scollect]
     permission: seriacollection.admin
+  recipes:
+    description: Open the Recipe Book.
+    usage: /recipes
+    aliases: [rb]
 permissions:
   seriacollection.admin:
     description: Allows use of admin commands

@@ -11,10 +11,12 @@
 - **Interactive GUI**: Beautiful menus to track progress, view rewards, and see locked tiers.
 - **Smart Tracking**: Automatically detects item types (including NBT-based custom items) to increment collection counts.
 - **Recursive Rewards**: Unlock new crafting recipes or items directly through collection progression.
+- **Advanced Recipe Book**: Integrated system to discover crafting layouts for all custom items and minions, with interactive ingredient navigation and unlock-based security.
 
 ## Commands
 - `/collect` (or `/collection`): Opens the collection overview menu.
-- `/seriacollection` (or `/scollect`): Administrative commands (Reload, Give, Set).
+- `/recipes`: Opens the centralized Recipe Book GUI.
+- `/seriacollection` (or `/scollect`): Administrative commands (Reload, Debug, Set).
 
 ## Developer Wiki
 For placeholders, permission nodes, and full YAML configuration examples, visit the [Wiki](docs/WIKI.md).
