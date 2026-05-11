@@ -14,17 +14,18 @@ reset-all-success: "<green>Berhasil mereset SEMUA koleksi milik %player%."
 # Variabel: %collection%, %old_roman%, %new_roman%, %rewards%
 tier-up-broadcast:
   - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-  - "<gold><bold>COLLECTION LEVEL UP </bold><white>%collection% %old_roman%<gray>➜<white>%new_roman%"
-  - "<green><bold>REWARDS</bold>"
-  - "%rewards%"
+  - " <gold><bold>COLLECTION LEVEL UP </bold><yellow>%collection% <gray>%old_roman%<gray><bold>➜</bold><yellow>%new_roman%"
+  - ""
+  - " <green><bold>HADIAH</bold>"
+  - "   %rewards%"
   - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 
 # Notifikasi Craft Minion Baru (Gambar 2)
 # Variabel: %tier%, %minion%, %needed%, %next_slot%
 minion-new-craft:
-  - "<green>You crafted a Tier %tier% %minion% Minion! That's a new one!"
-  - "<gray>Craft <white>%needed% <gray>more unique Minions to unlock your <white>%next_slot%th <gray>Minion slot!"
+  - "<green>Kamu membuat <white>Tier %tier% %minion% Minion<gray>! Mantap!"
+  - "<gray>Kamu hanya perlu membuat <white>%needed% <gray>Minion lagi untuk membuka slot <white>%next_slot%th"
 
 # Notifikasi Unlock Slot (Gambar 3)
 # Variabel: %slot%
-minion-slot-unlock: "<gold>You have now unlocked your %slot%th Minion slot!"
+minion-slot-unlock: "<gold>Kamu sekarang punya <white>%slot%th <gray>Minion slot!"

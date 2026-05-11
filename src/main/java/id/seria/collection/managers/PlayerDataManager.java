@@ -308,28 +308,47 @@ public class PlayerDataManager {
     private void checkTierUp(Player player, String colId, int old, int next) {
         Collection col = plugin.getCollectionManager().getCollection(colId);
         if (col == null) return;
+        
+        SeriaCollectionPlugin.debug("Checking tier up for " + player.getName() + " in " + colId + " (" + old + " -> " + next + ")");
+        
         for (Tier tier : col.getTiers().values()) {
-            if (old < tier.getRequirement() && next >= tier.getRequirement()) handleTierUp(player, col, tier);
+            if (old < tier.getRequirement() && next >= tier.getRequirement()) {
+                SeriaCollectionPlugin.debug("Triggering Tier Up: Level " + tier.getLevel());
+                handleTierUp(player, col, tier);
+            }
         }
     }
 
     private void handleTierUp(Player player, Collection col, Tier tier) {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            String oldRoman = id.seria.core.utils.NumberUtils.toRoman(tier.getLevel() - 1);
-            if (tier.getLevel() <= 1) oldRoman = "0";
-            String newRoman = id.seria.core.utils.NumberUtils.toRoman(tier.getLevel());
+            String oldRoman = tier.getLevel() <= 1 ? "0" : GuiUtils.toRoman(tier.getLevel() - 1);
+            String newRoman = GuiUtils.toRoman(tier.getLevel());
             
-            // Format rewards list
+            // Format rewards list (Utamakan display-rewards untuk tampilan notifikasi)
             StringBuilder rewardsBuilder = new StringBuilder();
-            List<String> rewards = tier.getRewards();
-            for (int i = 0; i < rewards.size(); i++) {
-                // Sederhanakan tampilan reward (biasanya format reward di core punya prefix tersendiri)
-                // Kita buat estetik seperti di gambar
-                rewardsBuilder.append("<gray>• ").append(rewards.get(i));
-                if (i < rewards.size() - 1) rewardsBuilder.append("\n");
+            List<String> displayRewards = tier.getDisplayRewards();
+            
+            // Jika displayRewards kosong, gunakan rewards biasa
+            if (displayRewards == null || displayRewards.isEmpty()) {
+                displayRewards = tier.getRewards();
+            }
+
+            if (displayRewards != null && !displayRewards.isEmpty()) {
+                for (int i = 0; i < displayRewards.size(); i++) {
+                    // Jangan pakai titik, langsung teks reward saja
+                    rewardsBuilder.append(displayRewards.get(i));
+                    // Jika ada baris berikutnya, tambahkan newline DAN spasi indentasi (3 spasi agar rata dengan baris pertama di config)
+                    if (i < displayRewards.size() - 1) {
+                        rewardsBuilder.append("\n   ");
+                    }
+                }
+            } else {
+                rewardsBuilder.append("<gray><i>None</i>");
             }
 
             List<String> lines = plugin.getConfigManager().getMessagesConfig().getStringList("tier-up-broadcast");
+            SeriaCollectionPlugin.debug("Found " + lines.size() + " lines for tier-up notification");
+            
             for (String line : lines) {
                 player.sendMessage(GuiUtils.format(line
                     .replace("%collection%", col.getName())

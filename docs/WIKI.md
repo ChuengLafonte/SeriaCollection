@@ -53,4 +53,29 @@ gui:
         slot: 10
         icon: OAK_SAPLING
         name: "<green>Foraging Collections"
+
+## 💬 Messages & Notifications
+
+### tier-up-broadcast
+This message is sent to the player when they level up a collection. Despite the name, it is a private message but follows a "broadcast-style" layout for aesthetics.
+
+**Available Placeholders:**
+- `%collection%`: The name of the collection.
+- `%old_roman%`: Previous tier level (Roman numerals).
+- `%new_roman%`: New tier level (Roman numerals).
+- `%rewards%`: A dynamically generated list of rewards.
+
+**Reward Formatting:**
+The system automatically pulls from `display-rewards` (preferred) or `rewards` in the collection file. Multiple rewards are automatically aligned with proper indentation for a "clean" look.
+
+Example `messages.yml`:
+```yaml
+tier-up-broadcast:
+  - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+  - " <gold><bold>COLLECTION LEVEL UP </bold><yellow>%collection% <gray>%old_roman%<gray><bold>➜</bold><yellow>%new_roman%"
+  - ""
+  - " <green><bold>HADIAH</bold>"
+  - "   %rewards%"
+  - "<yellow>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+```
 ```
