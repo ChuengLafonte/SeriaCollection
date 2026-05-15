@@ -29,6 +29,8 @@ public class CollectionManager {
         collectionsByMaterial.clear();
         collectionsByMmoId.clear();
 
+        plugin.getLogger().info("Starting collection load...");
+
         // 1. Load Category Order & Definitions from collections.yml
         FileConfiguration mainConfig = plugin.getConfigManager().getCollectionsConfig();
         loadCategoriesFromConfig(mainConfig);
@@ -39,18 +41,12 @@ public class CollectionManager {
         allConfigs.addAll(plugin.getConfigManager().getCollectionFiles());
 
         for (FileConfiguration config : allConfigs) {
-            // Kita dukung 3 format:
-            // 1. Root-level collections (koleksi langsung di root)
-            // 2. Category-wrapped collections (kategori -> collections -> item) -> Format baru Anda
-            // 3. Deep-wrapped (categories -> kategori -> collections -> item) -> Format lama
-            
             for (String key : config.getKeys(false)) {
                 if (key.equals("categories")) {
                     // Format 3: Deep-wrapped
                     ConfigurationSection deepCats = config.getConfigurationSection("categories");
                     if (deepCats != null) {
                         for (String catKey : deepCats.getKeys(false)) {
-                            // Daftarkan kategori jika belum ada
                             ensureCategoryExists(catKey, deepCats.getConfigurationSection(catKey));
                             
                             ConfigurationSection catColls = deepCats.getConfigurationSection(catKey + ".collections");
@@ -84,6 +80,8 @@ public class CollectionManager {
                 }
             }
         }
+        
+        plugin.getLogger().info("Loaded " + collectionsById.size() + " collections in " + categories.size() + " categories.");
     }
 
     private void loadCategoriesFromConfig(FileConfiguration config) {
@@ -97,7 +95,20 @@ public class CollectionManager {
 
     private void ensureCategoryExists(String catKey, ConfigurationSection section) {
         String key = catKey.toUpperCase();
-        if (categories.containsKey(key)) return;
+        if (categories.containsKey(key)) {
+            // Update metadata if section is provided
+            if (section != null) {
+                Category cat = categories.get(key);
+                cat.setName(section.getString("name", cat.getName()));
+                try {
+                    String iconStr = section.getString("icon");
+                    if (iconStr != null) cat.setIcon(Material.valueOf(iconStr.toUpperCase()));
+                } catch (Exception ignored) {}
+                List<String> lore = section.getStringList("lore");
+                if (!lore.isEmpty()) cat.setLore(lore);
+            }
+            return;
+        }
 
         String name = catKey;
         Material icon = Material.CHEST;
@@ -112,10 +123,12 @@ public class CollectionManager {
         }
 
         categories.put(key, new Category(key, name, icon, lore));
+        plugin.getLogger().info("Registered category: " + key);
     }
 
     private void parseAndRegisterCollection(String collKey, ConfigurationSection collSection, String categoryKey) {
-        if (collSection == null || collectionsById.containsKey(collKey)) return;
+        String id = collKey.toLowerCase();
+        if (collSection == null || collectionsById.containsKey(id)) return;
 
         String collName = collSection.getString("name", collKey);
         String mmoId = collSection.getString("mmoitem-id");
@@ -131,7 +144,7 @@ public class CollectionManager {
             }
         }
 
-        Collection collection = new Collection(collKey, collName, materialList, mmoId);
+        Collection collection = new Collection(id, collName, materialList, mmoId);
         
         // Load Tiers
         ConfigurationSection tiersSection = collSection.getConfigurationSection("tiers");
@@ -148,7 +161,7 @@ public class CollectionManager {
         }
 
         // Register
-        collectionsById.put(collKey, collection);
+        collectionsById.put(id, collection);
         for (Material m : materialList) collectionsByMaterial.put(m, collection);
         if (mmoId != null && !mmoId.isEmpty()) collectionsByMmoId.put(mmoId.toUpperCase(), collection);
 
@@ -160,6 +173,7 @@ public class CollectionManager {
             category = categories.get(catKey);
         }
         category.addCollection(collection);
+        // plugin.getLogger().info("Registered collection: " + id + " in category " + catKey);
     }
 
     public Map<String, Category> getCategories() {

@@ -85,12 +85,12 @@
             <version>1.1.2</version>
             <scope>provided</scope>
         </dependency>
-        <!-- TopMinions API -->
         <dependency>
             <groupId>com.sarry20</groupId>
             <artifactId>TopMinion</artifactId>
             <version>2.6.1</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>D:/testserver/plugins/TopMinion (1).jar</systemPath>
         </dependency>
         <dependency>
             <groupId>id.seria</groupId>

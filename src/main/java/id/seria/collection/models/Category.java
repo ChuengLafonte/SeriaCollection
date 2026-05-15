@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class Category {
     private final String id;
-    private final String name;
-    private final Material icon;
-    private final List<String> lore;
+    private String name;
+    private Material icon;
+    private List<String> lore;
     private final Map<String, Collection> collections;
 
     public Category(String id, String name, Material icon, List<String> lore) {
@@ -18,7 +18,7 @@ public class Category {
         this.name = name;
         this.icon = icon;
         this.lore = lore != null ? lore : new ArrayList<>();
-        this.collections = new HashMap<>();
+        this.collections = new java.util.LinkedHashMap<>();
     }
 
     public void addCollection(Collection collection) {
@@ -30,4 +30,8 @@ public class Category {
     public Material getIcon() { return icon; }
     public List<String> getLore() { return lore; }
     public Map<String, Collection> getCollections() { return collections; }
+
+    public void setName(String name) { this.name = name; }
+    public void setIcon(Material icon) { this.icon = icon; }
+    public void setLore(List<String> lore) { this.lore = lore; }
 }

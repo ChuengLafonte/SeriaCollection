@@ -136,10 +136,20 @@ public class CategoryMenu implements InventoryHolder, Listener {
                         .replace("%amount_formatted%", String.format("%,d", amount));
                 
                 if (nextTier != null) {
+                    int percent = (int) (((double) amount / nextTier.getRequirement()) * 100);
+                    String progressBar = GuiUtils.getProgressBar(amount, nextTier.getRequirement(), 20, '-', "<green>", "<gray>");
                     processed = processed
                         .replace("%next_tier%", GuiUtils.toRoman(nextTier.getLevel()))
                         .replace("%requirement%", String.valueOf(nextTier.getRequirement()))
-                        .replace("%requirement_formatted%", String.format("%,d", nextTier.getRequirement()));
+                        .replace("%requirement_formatted%", String.format("%,d", nextTier.getRequirement()))
+                        .replace("%percentage%", String.valueOf(percent))
+                        .replace("%progress_bar%", progressBar);
+                } else {
+                    // For maxed collections, still replace progress placeholders with full values
+                    processed = processed
+                        .replace("%next_tier%", "MAX")
+                        .replace("%percentage%", "100")
+                        .replace("%progress_bar%", GuiUtils.getProgressBar(100, 100, 20, '-', "<green>", "<gray>"));
                 }
                 lore.add(GuiUtils.format(processed));
             }
