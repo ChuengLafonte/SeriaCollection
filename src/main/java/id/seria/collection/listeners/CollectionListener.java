@@ -13,6 +13,8 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.ClickType;
 
 public class CollectionListener implements Listener {
 
@@ -83,6 +85,50 @@ public class CollectionListener implements Listener {
     public void onBlockDrop(org.bukkit.event.block.BlockDropItemEvent e) {
         for (org.bukkit.entity.Item itemEntity : e.getItems()) {
             plugin.getPlayerDataManager().taintEntity(itemEntity);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player player)) return;
+        if (e.getClickedInventory() == null) return;
+
+        // Identify if it's a TopMinion inventory
+        org.bukkit.inventory.InventoryHolder holder = e.getInventory().getHolder();
+        boolean isMinion = false;
+        
+        if (holder != null) {
+            String className = holder.getClass().getName().toLowerCase();
+            if (className.contains("topminion") || className.contains("minioninventory")) {
+                isMinion = true;
+            }
+        }
+        
+        // Fallback: Check title if holder doesn't match
+        if (!isMinion) {
+            String title = e.getView().getTitle().toLowerCase();
+            if (title.contains("minion")) {
+                isMinion = true;
+            }
+        }
+
+        if (isMinion) {
+            // Check if player clicked the minion inventory (not their own)
+            if (e.getClickedInventory().equals(e.getView().getTopInventory())) {
+                ItemStack item = e.getCurrentItem();
+                if (item == null || item.getType().isAir()) return;
+
+                // Skip common GUI filler items
+                if (item.getType().name().contains("GLASS_PANE")) return;
+
+                ClickType click = e.getClick();
+                // If they are taking the item out
+                if (click.isLeftClick() || click.isRightClick() || click.isShiftClick() || click == ClickType.NUMBER_KEY) {
+                    plugin.getPlayerDataManager().handleCollectionGain(player, item);
+                    // Taint to prevent duplicate counting if they put it back or move it around
+                    plugin.getPlayerDataManager().taintItem(item);
+                }
+            }
         }
     }
 

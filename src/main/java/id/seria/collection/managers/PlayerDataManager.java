@@ -265,9 +265,37 @@ public class PlayerDataManager {
     }
 
     public void handleCollectionGain(Player player, org.bukkit.inventory.ItemStack item) {
-        if (item == null || item.getType().isAir() || isTainted(item)) return;
-        Collection col = plugin.getCollectionManager().getCollectionByMaterial(item.getType());
-        if (col != null) addAmount(player, col.getId(), item.getAmount());
+        if (item == null || item.getType().isAir()) return;
+        
+        // --- ANTI-EXPLOIT: Check Taint ---
+        if (isTainted(item)) {
+            return;
+        }
+
+
+        id.seria.collection.models.Collection collection = null;
+        
+        // 1. Try MMOItem Tracking
+        try {
+            if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("MythicLib")) {
+                io.lumine.mythic.lib.api.item.NBTItem nbtItem = io.lumine.mythic.lib.api.item.NBTItem.get(item);
+                if (nbtItem.hasType()) {
+                    String type = nbtItem.getType();
+                    String mmoId = nbtItem.getString("MMOITEMS_ITEM_ID");
+                    collection = plugin.getCollectionManager().getCollectionByMmoId(type + ":" + mmoId);
+                }
+            }
+        } catch (NoClassDefFoundError ignored) {
+        }
+        
+        // 2. Fallback to Material Tracking
+        if (collection == null) {
+            collection = plugin.getCollectionManager().getCollectionByMaterial(item.getType());
+        }
+        
+        if (collection != null) {
+            addAmount(player, collection.getId(), item.getAmount());
+        }
     }
 
     public void taintEntity(org.bukkit.entity.Item entity) {
