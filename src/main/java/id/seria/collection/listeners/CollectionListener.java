@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -60,6 +61,14 @@ public class CollectionListener implements Listener {
             if (drop == null || drop.getType().isAir()) continue;
             plugin.getPlayerDataManager().handleCollectionGain(player, drop);
         }
+
+        // ANTI-EXPLOIT: Taint container contents to prevent exploit when breaking chests/dispensers/etc
+        if (e.getBlock().getState() instanceof Container container) {
+            for (ItemStack item : container.getInventory().getContents()) {
+                if (item == null || item.getType().isAir()) continue;
+                plugin.getPlayerDataManager().taintItem(item);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -86,6 +95,15 @@ public class CollectionListener implements Listener {
         for (org.bukkit.entity.Item itemEntity : e.getItems()) {
             plugin.getPlayerDataManager().taintEntity(itemEntity);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDispense(BlockDispenseEvent e) {
+        ItemStack item = e.getItem();
+        if (item == null || item.getType().isAir()) return;
+        
+        plugin.getPlayerDataManager().taintItem(item);
+        e.setItem(item);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
