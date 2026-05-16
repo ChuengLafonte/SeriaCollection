@@ -150,11 +150,12 @@ public class RecipeBookManager {
         if (recipe.isMinionRecipe() || recipe.getMmoId().toLowerCase().contains("minion")) {
             return "MINION";
         }
-        
+
         String reqId = recipe.getRequireCollectionId();
         if (reqId != null && !reqId.isEmpty()) {
+            String lowReqId = reqId.toLowerCase();
             for (Category cat : plugin.getCollectionManager().getCategories().values()) {
-                if (cat.getCollections().containsKey(reqId)) {
+                if (cat.getCollections().containsKey(lowReqId)) {
                     return cat.getId().toUpperCase();
                 }
             }
