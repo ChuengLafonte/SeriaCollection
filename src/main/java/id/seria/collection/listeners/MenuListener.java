@@ -137,7 +137,7 @@ public class MenuListener implements Listener {
 
         SeriaCollectionPlugin.debug("ListMenu clicked item: " + item.getType() + " in category: " + category);
 
-        SeriaRecipe recipe = plugin.getRecipeBookManager().getFirstRecipeForItem(item);
+        SeriaRecipe recipe = plugin.getRecipeBookManager().getBestRecipeForPlayer(player, item);
         if (recipe != null) {
             SeriaCollectionPlugin.debug("Opening RecipeDetailMenu for: " + recipe.getMmoId());
             if (plugin.getRecipeBookManager().isUnlocked(player, recipe)) {
@@ -172,17 +172,26 @@ public class MenuListener implements Listener {
                     // Cari resep di RecipeBookManager berdasarkan nama item
                     // Contoh line: " Enchanted Wheat Recipe" -> ambil "Enchanted Wheat"
                     String itemName = plain.replace("Recipe", "").replace("-", "").trim();
+                    SeriaRecipe matchedRecipe = null;
+                    boolean foundNameMatch = false;
                     for (SeriaRecipe recipe : plugin.getRecipeBookManager().getAllRecipes()) {
                         ItemStack output = plugin.getRecipeBookManager().getOutputItem(recipe);
                         if (output != null) {
                             String outName = GuiUtils.stripColor(output.getItemMeta().getDisplayName());
                             if (outName.equalsIgnoreCase(itemName)) {
+                                foundNameMatch = true;
                                 if (plugin.getRecipeBookManager().isUnlocked(player, recipe)) {
-                                    new RecipeDetailMenu(plugin, "OTHERS").open(player, recipe);
+                                    matchedRecipe = recipe;
+                                    break;
                                 }
-                                return;
                             }
                         }
+                    }
+                    if (matchedRecipe != null) {
+                        new RecipeDetailMenu(plugin, "OTHERS").open(player, matchedRecipe);
+                        return;
+                    } else if (foundNameMatch) {
+                        return;
                     }
                 }
             }
@@ -205,7 +214,7 @@ public class MenuListener implements Listener {
         if (item.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
 
         // Jika item yang diklik adalah ingredient atau result
-        SeriaRecipe subRecipe = plugin.getRecipeBookManager().getFirstRecipeForItem(item);
+        SeriaRecipe subRecipe = plugin.getRecipeBookManager().getBestRecipeForPlayer(player, item);
         if (subRecipe != null) {
             if (plugin.getRecipeBookManager().isUnlocked(player, subRecipe)) {
                 new RecipeDetailMenu(plugin, menu.getCategory()).open(player, subRecipe);

@@ -104,7 +104,7 @@ public class RecipeDetailMenu implements InventoryHolder {
                 ItemMeta meta = display.getItemMeta();
                 if (meta != null) {
                     List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? meta.lore() : new ArrayList<>();
-                    SeriaRecipe subRecipe = plugin.getRecipeBookManager().getFirstRecipeForItem(ingredient);
+                    SeriaRecipe subRecipe = plugin.getRecipeBookManager().getBestRecipeForPlayer(player, ingredient);
                     if (subRecipe != null) {
                         lore.add(GuiUtils.format(""));
                         if (plugin.getRecipeBookManager().isUnlocked(player, subRecipe)) {

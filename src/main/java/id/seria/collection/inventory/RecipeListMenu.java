@@ -81,6 +81,16 @@ public class RecipeListMenu implements InventoryHolder {
             boolean unlocked = plugin.getRecipeBookManager().isUnlocked(player, recipe);
             
             ItemStack display = plugin.getRecipeBookManager().getOutputItem(recipe);
+            if (!unlocked && display != null) {
+                for (SeriaRecipe alt : plugin.getRecipeBookManager().getRecipesByOutput(display)) {
+                    if (plugin.getRecipeBookManager().isUnlocked(player, alt)) {
+                        unlocked = true;
+                        recipe = alt;
+                        display = plugin.getRecipeBookManager().getOutputItem(recipe);
+                        break;
+                    }
+                }
+            }
             if (unlocked && display != null) {
                 display = display.clone();
                 ItemMeta meta = display.getItemMeta();

@@ -76,13 +76,33 @@ public class RecipeBookManager {
         List<SeriaRecipe> found = new ArrayList<>();
         if (item == null || item.getType() == Material.AIR) return found;
 
+        String cleanName = getCleanName(item);
         for (SeriaRecipe recipe : getAllRecipes()) {
             ItemStack output = getOutputItem(recipe);
-            if (output != null && output.isSimilar(item)) {
-                found.add(recipe);
+            if (output != null) {
+                if (output.isSimilar(item)) {
+                    found.add(recipe);
+                } else if (output.getType() == item.getType()) {
+                    String outputCleanName = getCleanName(output);
+                    if (!cleanName.isEmpty() && cleanName.equals(outputCleanName)) {
+                        found.add(recipe);
+                    }
+                }
             }
         }
         return found;
+    }
+
+    public SeriaRecipe getBestRecipeForPlayer(Player player, ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
+        List<SeriaRecipe> matching = getRecipesByOutput(item);
+        if (matching.isEmpty()) return null;
+        for (SeriaRecipe recipe : matching) {
+            if (isUnlocked(player, recipe)) {
+                return recipe;
+            }
+        }
+        return matching.get(0);
     }
 
     public SeriaRecipe getFirstRecipeForItem(ItemStack item) {
@@ -174,7 +194,9 @@ public class RecipeBookManager {
     public ItemStack getOutputItem(SeriaRecipe recipe) {
         String cacheKey = recipe.getMmoType() + ":" + recipe.getMmoId();
         if (outputCache.containsKey(cacheKey)) {
-            return outputCache.get(cacheKey).clone();
+            ItemStack item = outputCache.get(cacheKey).clone();
+            item.setAmount(recipe.getOutputAmount());
+            return item;
         }
 
         ItemStack item = null;
@@ -228,7 +250,9 @@ public class RecipeBookManager {
         }
 
         outputCache.put(cacheKey, item.clone());
-        return item;
+        ItemStack result = item.clone();
+        result.setAmount(recipe.getOutputAmount());
+        return result;
     }
 
     private ItemStack tryFindMinion(String mType, String mMat, String mLevel, String[] categories) {
