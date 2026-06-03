@@ -90,7 +90,7 @@
             <artifactId>TopMinion</artifactId>
             <version>2.6.1</version>
             <scope>system</scope>
-            <systemPath>D:/testserver/plugins/TopMinion (1).jar</systemPath>
+            <systemPath>E:/Project Plugin/lib/TopMinion (3).jar</systemPath>
         </dependency>
         <dependency>
             <groupId>id.seria</groupId>
