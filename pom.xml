@@ -89,8 +89,7 @@
             <groupId>com.sarry20</groupId>
             <artifactId>TopMinion</artifactId>
             <version>2.6.1</version>
-            <scope>system</scope>
-            <systemPath>E:/Project Plugin/lib/TopMinion (3).jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>id.seria</groupId>

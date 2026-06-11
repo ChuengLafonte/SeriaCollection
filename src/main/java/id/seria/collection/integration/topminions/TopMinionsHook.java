@@ -1,22 +1,40 @@
 package id.seria.collection.integration.topminions;
 
-import com.sarry20.topminion.models.minionConfig.MinionConfigClass;
-import com.sarry20.topminion.models.minionConfig.MinionConfigClassManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.inventory.ItemStack;
+import java.lang.reflect.Method;
 
 public class TopMinionsHook {
+
+    private static Class<?> spawnItemManagerClass;
+    private static Method getSpawnerItemMethod;
+    private static boolean initialized = false;
 
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().isPluginEnabled("TopMinion");
     }
 
-    public static List<MinionConfigClass> getMinionTypes() {
-        if (!isAvailable()) return new ArrayList<>();
-        return MinionConfigClassManager.getConfigClassList();
+    private static void initReflection() {
+        if (initialized) return;
+        initialized = true;
+        if (isAvailable()) {
+            try {
+                spawnItemManagerClass = Class.forName("com.sarry20.topminion.models.spawnItem.SpawnItemManager");
+                getSpawnerItemMethod = spawnItemManagerClass.getMethod("getSpawnerItem", String.class, String.class, String.class);
+            } catch (Exception ignored) {}
+        }
+    }
+
+    public static ItemStack getSpawnerItem(String type, String mat, String lvl) {
+        if (!isAvailable()) return null;
+        initReflection();
+        if (getSpawnerItemMethod != null) {
+            try {
+                return (ItemStack) getSpawnerItemMethod.invoke(null, type, mat, lvl);
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
     /**
@@ -27,10 +45,6 @@ public class TopMinionsHook {
      */
     public static void setMilestonePermission(Player player, int level) {
         if (!isAvailable() || level <= 0) return;
-        
-        // Sebelum memberikan level yang baru, kita harus menghapus level sebelumnya (opsional tapi disarankan)
-        // Namun LuckPerms 'set' biasanya cukup jika kita ingin menimpa. 
-        // Jika kita ingin player hanya punya satu level tertinggi, kita bisa hapus level level-1.
         
         String permission = "seria.topminion." + level;
         String command = "lp user " + player.getName() + " permission set " + permission + " true";

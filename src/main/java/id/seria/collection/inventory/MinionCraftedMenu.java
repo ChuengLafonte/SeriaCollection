@@ -3,7 +3,7 @@ package id.seria.collection.inventory;
 import id.seria.collection.SeriaCollectionPlugin;
 import id.seria.collection.utils.GuiUtils;
 import id.seria.collection.integration.topminions.TopMinionsHook;
-import com.sarry20.topminion.models.minionConfig.MinionConfigClass;
+
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

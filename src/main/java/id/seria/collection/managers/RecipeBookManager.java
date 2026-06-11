@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import com.sarry20.topminion.models.spawnItem.SpawnItemManager;
+import id.seria.collection.integration.topminions.TopMinionsHook;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -263,24 +263,24 @@ public class RecipeBookManager {
             String lvl = mLevel;
 
             if (!type.isEmpty()) {
-                ItemStack item = SpawnItemManager.getSpawnerItem(type, mat, lvl);
+                ItemStack item = TopMinionsHook.getSpawnerItem(type, mat, lvl);
                 if (item != null) return item;
-                item = SpawnItemManager.getSpawnerItem(mat, type, lvl);
+                item = TopMinionsHook.getSpawnerItem(mat, type, lvl);
                 if (item != null) return item;
             }
             
             for (String cat : categories) {
                 String c = cat.toUpperCase();
-                ItemStack item = SpawnItemManager.getSpawnerItem(c, mat, lvl);
+                ItemStack item = TopMinionsHook.getSpawnerItem(c, mat, lvl);
                 if (item != null) return item;
-                item = SpawnItemManager.getSpawnerItem(mat, c, lvl);
+                item = TopMinionsHook.getSpawnerItem(mat, c, lvl);
                 if (item != null) return item;
                 
                 if (mat.contains("_")) {
                     String simpleMat = mat.split("_")[0];
-                    item = SpawnItemManager.getSpawnerItem(c, simpleMat, lvl);
+                    item = TopMinionsHook.getSpawnerItem(c, simpleMat, lvl);
                     if (item != null) return item;
-                    item = SpawnItemManager.getSpawnerItem(simpleMat, c, lvl);
+                    item = TopMinionsHook.getSpawnerItem(simpleMat, c, lvl);
                     if (item != null) return item;
                 }
             }
